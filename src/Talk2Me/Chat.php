@@ -37,7 +37,8 @@ class Chat implements MessageComponentInterface {
                         // Ensure message is sent to the proper room.
                         && $this->rooms[$from->resourceId]['room'] == $this->rooms[$client->resourceId]['room']) {
                     // The sender is not the receiver, send to each client connected
-                    $client->send($json->msg);
+                    $o = array("status"=>"ok", "a"=>"message", "msg"=>$json->msg);
+                    $client->send(json_encode($o));
                 }
             }
         }
@@ -48,6 +49,13 @@ class Chat implements MessageComponentInterface {
         $this->clients->detach($conn);
 
         echo "Connection {$conn->resourceId} has disconnected\n";
+        foreach ($this->clients as $client) {
+            $o = array("status"=>"ok", "a"=>"message", 
+                    "msg"=>"<span style=\"color:red;\">@" 
+                    . $this->rooms[$conn->resourceId]['username'] 
+                    . " has disconnected.</span>");
+            $client->send(json_encode($o));
+        }
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e) {

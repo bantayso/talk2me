@@ -29,16 +29,23 @@ function sendMessage(msg) {
             + "<img><br><br/><a><p><div><ul><li><ol><span><hr><hr/><dd><dl><dt>");
     var jsonMsg = "{\"a\": \"message\", \"msg\": \"" + msg.replace(/"/g, "\\\"") + "\"}";
     conn.send(jsonMsg);
-    handleMessage(msg);
+    appendMessage(msg);
 }
 
-function handleMessage(msg) {
+function handleMessage(json) {
     if (isLoggedIn) {
-        var notif = new Audio("cdn/sounds/notification.ogg");
-        notif.play();
-        $(".messages").append("<div class=\"well well-sm\">" + msg + "</div>");
-        $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+        jsonObj = JSON.parse(json);
+        if (jsonObj.a === "message") {
+            var notif = new Audio("cdn/sounds/notification.ogg");
+            notif.play();
+            appendMessage(jsonObj.msg);
+        }
     }
+}
+
+function appendMessage(msg) {
+    $(".messages").append("<div class=\"well well-sm\">" + msg + "</div>");
+    $("html, body").animate({ scrollTop: $(document).height() }, 1000);
 }
 
 function login() {
@@ -90,6 +97,9 @@ function startConnection(room, username) {
 
     conn.onopen = function(e) {
         conn.send("{\"a\": \"login\", \"room\":\"" + room + "\", \"username\": \"" + username + "\"}");
+    };
+
+    conn.onclose = function(e) {
     };
 
     conn.onmessage = function(e) {
