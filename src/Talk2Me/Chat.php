@@ -6,6 +6,7 @@ use Ratchet\ConnectionInterface;
 class Chat implements MessageComponentInterface {
     protected $clients;
     private $rooms;
+    private $roomUsers;
 
     public function __construct() {
         $this->clients = new \SplObjectStorage;
@@ -28,6 +29,18 @@ class Chat implements MessageComponentInterface {
         // Handle login
         if ($json->a == "login") {
             $this->rooms[$from->resourceId] = array("room"=>$json->room, "username"=>$json->username);
+            $this->roomUsers[$json->room][$json->username] = $json->username;
+
+            $currentMembers = "";
+            foreach ($this->roomUsers[$json->room] as $username) {
+                $currentMembers .= "@{$username}, ";
+            }
+            $currentMembers = rtrim($currentMembers, ", ");
+            $currentMembersObj = array("status"=>"ok", "a"=>"message", 
+                    "msg"=>"<strong>Current room members:</strong> {$currentMembers} <span class=\"timestamp\">" 
+                    . date("Y-m-d H:i:s") . "</span>");
+            $from->send(json_encode($currentMembersObj));
+
             foreach ($this->clients as $client) {
                 if ($from !== $client 
                         // Ensure message is sent to the proper room.
@@ -65,6 +78,12 @@ class Chat implements MessageComponentInterface {
                     . $this->rooms[$conn->resourceId]['username'] 
                     . " has disconnected.</span> <span class=\"timestamp\">" 
                     . date("Y-m-d H:i:s") . "</span>");
+            $key = array_search($this->rooms[$conn->resourceId]['username'], 
+                    $this->roomUsers[$this->rooms[$conn->resourceId]['room']]);
+            if ($key) {
+                unset($this->roomUsers[$this->rooms[$conn->resourceId]['room']][$key]);
+            }
+            unset($this->rooms[$conn->resourceId]);
             $client->send(json_encode($o));
         }
     }
