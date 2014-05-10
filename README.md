@@ -7,6 +7,10 @@ A simple WebSocket chat client and server written in PHP and JavaScript with use
 
 INSTALL
 =======
+Install composer dependencies.
+
+    composer.phar install
+
 Run chat server.
 
     php bin/chat-server.php
