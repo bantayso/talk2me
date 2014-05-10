@@ -34,6 +34,7 @@ TODO
 ====
 As this is an alpha release there is much refactoring and testing to do.
 
+* On connection lost message is sent to users. Need to make sure only the connected room is notified.
 * If connection is lost, notify some how. Phones may do this when display is locked.
 * Logout link.
 * Display active users in room.
