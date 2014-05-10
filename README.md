@@ -36,9 +36,7 @@ As this is an alpha release there is much refactoring and testing to do.
 
 * Admin room for sending global messages.
 * On connection lost message is sent to users. Need to make sure only the connected room is notified.
-* If connection is lost, notify some how. Phones may do this when display is locked.
 * Logout link.
-* Display active users in room.
 * Don't allow duplicate usernames.
 * Better room and username validation. Currently room and user names aren't very restrictive.
 * Verify all communication is secure.
