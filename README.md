@@ -34,6 +34,7 @@ TODO
 ====
 As this is an alpha release there is much refactoring and testing to do.
 
+* If connection is lost, notify some how. Phones may do this when display is locked.
 * Logout link.
 * Display active users in room.
 * Don't allow duplicate usernames.

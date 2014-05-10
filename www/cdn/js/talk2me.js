@@ -34,6 +34,8 @@ function sendMessage(msg) {
 
 function handleMessage(msg) {
     if (isLoggedIn) {
+        var notif = new Audio("cdn/sounds/notification.ogg");
+        notif.play();
         $(".messages").append("<div class=\"well well-sm\">" + msg + "</div>");
         $("html, body").animate({ scrollTop: $(document).height() }, 1000);
     }
