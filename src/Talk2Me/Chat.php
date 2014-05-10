@@ -33,7 +33,8 @@ class Chat implements MessageComponentInterface {
                         // Ensure message is sent to the proper room.
                         && $this->rooms[$from->resourceId]['room'] == $this->rooms[$client->resourceId]['room']) {
                     $o = array("status"=>"ok", "a"=>"message", "msg"=>"<span style=\"color:green;\">@" 
-                            . $json->username . " has just joined the room.");
+                            . $json->username . " just joined the room.</span> <span class=\"timestamp\">" 
+                            . date("Y-m-d H:i:s") . "</span>");
                     $client->send(json_encode($o));
                 }
             }
@@ -62,7 +63,8 @@ class Chat implements MessageComponentInterface {
             $o = array("status"=>"ok", "a"=>"message", 
                     "msg"=>"<span style=\"color:red;\">@" 
                     . $this->rooms[$conn->resourceId]['username'] 
-                    . " has disconnected.</span>");
+                    . " has disconnected.</span> <span class=\"timestamp\">" 
+                    . date("Y-m-d H:i:s") . "</span>");
             $client->send(json_encode($o));
         }
     }
