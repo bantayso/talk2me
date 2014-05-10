@@ -1,0 +1,14 @@
+footer {
+    margin-bottom:64px;
+}
+.well {
+    padding:4px;
+    margin-bottom:8px;
+}
+
+.timestamp {
+    color:gray;
+    margin-left:32px;
+    font-style:italic;
+    font-size:0.75em;
+}
