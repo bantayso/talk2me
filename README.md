@@ -32,8 +32,11 @@ e.g. https://www.example.com/talk2me/#room@username
 
 TODO
 ====
+As this is an alpha release there is much refactoring and testing to do.
+
+* Logout link.
 * Display active users in room.
-* As this is an alpha release there is much refactoring and testing to do.
 * Don't allow duplicate usernames.
 * Better room and username validation. Currently room and user names aren't very restrictive.
 * Verify all communication is secure.
+* Secure rooms
