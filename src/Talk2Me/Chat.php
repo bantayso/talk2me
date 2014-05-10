@@ -28,6 +28,15 @@ class Chat implements MessageComponentInterface {
         // Handle login
         if ($json->a == "login") {
             $this->rooms[$from->resourceId] = array("room"=>$json->room, "username"=>$json->username);
+            foreach ($this->clients as $client) {
+                if ($from !== $client 
+                        // Ensure message is sent to the proper room.
+                        && $this->rooms[$from->resourceId]['room'] == $this->rooms[$client->resourceId]['room']) {
+                    $o = array("status"=>"ok", "a"=>"message", "msg"=>"<span style=\"color:green;\">@" 
+                            . $json->username . " has just joined the room.");
+                    $client->send(json_encode($o));
+                }
+            }
             return;
         }
 
