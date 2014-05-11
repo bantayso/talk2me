@@ -66,16 +66,10 @@ class Chat implements MessageComponentInterface {
     public function onClose(ConnectionInterface $conn) {
         $this->clients->detach($conn);
 
-        $key = array_search($this->getUsername($conn), 
-                $this->roomUsers[$this->getRoom($conn)]);
-        $room = null;
-        $username = null;
-        if ($key) {
-            $room = $this->getRoom($conn);
-            $username = $this->getUsername($conn);
-            unset($this->roomUsers[$this->rooms[$conn->resourceId]['room']][$key]);
-            unset($this->rooms[$conn->resourceId]);
-        }
+        $room = $this->getRoom($conn);
+        $username = $this->getUsername($conn);
+
+        $this->unsetRoomUserClient($conn);
 
         if (isset($room) && isset($username)) {
             foreach ($this->clients as $client) {
@@ -108,6 +102,15 @@ class Chat implements MessageComponentInterface {
 
     public function setUsername($client, $username) {
         $this->rooms[$client->resourceId]['username'] = $username;
+    }
+
+    public function unsetRoomUserClient($client) {
+        $key = array_search($this->getUsername($client), 
+                $this->roomUsers[$this->getRoom($client)]);
+        if ($key) {
+            unset($this->roomUsers[$this->rooms[$client->resourceId]['room']][$key]);
+            unset($this->rooms[$client->resourceId]);
+        }
     }
 
 }
