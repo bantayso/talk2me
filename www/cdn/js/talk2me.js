@@ -39,6 +39,9 @@ function handleMessage(json) {
             var notif = new Audio("cdn/sounds/notification.ogg");
             notif.play();
             appendMessage(jsonObj.msg);
+            if (!windowFocused && jsonObj.t === "message") {
+                Tinycon.setBubble(++messageCount);
+            }
         }
     }
 }
@@ -121,6 +124,16 @@ function init() {
         login();
     }
 }
+
+windowFocused = true;
+messageCount = 0;
+$(window).focus(function() {
+    windowFocused = true;
+    messageCount = 0;
+    Tinycon.setBubble(messageCount);
+}).blur(function() {
+    windowFocused = false;
+});
 
 $(document).ready(function() {
     isLoggedIn = false;

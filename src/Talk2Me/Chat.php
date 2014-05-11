@@ -34,7 +34,7 @@ class Chat implements MessageComponentInterface {
                 $currentMembers .= "@{$username}, ";
             }
             $currentMembers = rtrim($currentMembers, ", ");
-            $currentMembersObj = array("status"=>"ok", "a"=>"message", 
+            $currentMembersObj = array("status"=>"ok", "a"=>"message", "t"=>"status",
                     "msg"=>"<strong style=\"color:green;\">Online</strong> {$currentMembers} <span class=\"timestamp\">" 
                     . date("Y-m-d H:i:s") . "</span>");
             $from->send(json_encode($currentMembersObj));
@@ -43,7 +43,8 @@ class Chat implements MessageComponentInterface {
                 if ($from !== $client 
                         // Ensure message is sent to the proper room.
                         && $this->getRoom($from) === $this->getRoom($client)) {
-                    $o = array("status"=>"ok", "a"=>"message", "msg"=>"<span style=\"color:green;\">@" 
+                    $o = array("status"=>"ok", "a"=>"message", "t"=>"status", 
+                            "msg"=>"<span style=\"color:green;\">@" 
                             . $json->username . " joined</span> <span class=\"timestamp\">" 
                             . date("Y-m-d H:i:s") . "</span>");
                     $client->send(json_encode($o));
@@ -61,7 +62,8 @@ class Chat implements MessageComponentInterface {
                 if ($from !== $client 
                         // Ensure message is sent to the proper room.
                         && $this->getRoom($from) === $this->getRoom($client)) {
-                    $o = array("status"=>"ok", "a"=>"message", "msg"=>$json->msg);
+                    $o = array("status"=>"ok", "a"=>"message", "t"=>"message", 
+                            "msg"=>$json->msg);
                     $client->send(json_encode($o));
                 }
             }
