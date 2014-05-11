@@ -71,20 +71,28 @@ class Chat implements MessageComponentInterface {
         // The connection is closed, remove it, as we can no longer send it messages
         $this->clients->detach($conn);
 
-        //echo "Connection {$conn->resourceId} has disconnected\n";
-        foreach ($this->clients as $client) {
-            $o = array("status"=>"ok", "a"=>"message", 
-                    "msg"=>"<span style=\"color:red;\">@" 
-                    . $this->rooms[$conn->resourceId]['username'] 
-                    . " disconnected</span> <span class=\"timestamp\">" 
-                    . date("Y-m-d H:i:s") . "</span>");
-            $key = array_search($this->rooms[$conn->resourceId]['username'], 
-                    $this->roomUsers[$this->rooms[$conn->resourceId]['room']]);
-            if ($key) {
-                unset($this->roomUsers[$this->rooms[$conn->resourceId]['room']][$key]);
-            }
+        $key = array_search($this->rooms[$conn->resourceId]['username'], 
+                $this->roomUsers[$this->rooms[$conn->resourceId]['room']]);
+        $room = null;
+        $username = null;
+        if ($key) {
+            $room = $this->rooms[$conn->resourceId]['room'];
+            $username = $this->rooms[$conn->resourceId]['username'];
+            unset($this->roomUsers[$this->rooms[$conn->resourceId]['room']][$key]);
             unset($this->rooms[$conn->resourceId]);
-            $client->send(json_encode($o));
+        }
+
+        //echo "Connection {$conn->resourceId} has disconnected\n";
+        if (isset($room) && isset($username)) {
+            foreach ($this->clients as $client) {
+                $o = array("status"=>"ok", "a"=>"message", 
+                        "msg"=>"<span style=\"color:red;\">@" 
+                        . $username . " disconnected</span> <span class=\"timestamp\">" 
+                        . date("Y-m-d H:i:s") . "</span>");
+                if ($this->rooms[$client->resourceId]['room'] == $room) {
+                    $client->send(json_encode($o));
+                }
+            }
         }
     }
 
