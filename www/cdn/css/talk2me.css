@@ -1,6 +1,21 @@
+@font-face {
+    font-family:"engel";
+    src:url("engel_light_ltd.ttf");
+}
+
+body, input {
+    font-family:"engel", sans-serif;
+    font-weight:250;
+}
+
+strong {
+    font-weight:900;
+}
+
 footer {
     margin-bottom:64px;
 }
+
 .well {
     padding:4px;
     margin-bottom:8px;
@@ -9,7 +24,6 @@ footer {
 .timestamp {
     color:gray;
     margin-left:32px;
-    font-style:italic;
     font-size:0.75em;
 }
 
