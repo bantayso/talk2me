@@ -4,6 +4,7 @@ use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
 class Chat implements MessageComponentInterface {
+
     protected $clients;
     private $rooms;
     private $roomUsers;
@@ -13,22 +14,17 @@ class Chat implements MessageComponentInterface {
     }
 
     public function onOpen(ConnectionInterface $conn) {
-        // Store the new connection to send messages to later
         $this->clients->attach($conn);
-
-        //echo "New connection! ({$conn->resourceId})\n";
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
-        $numRecv = count($this->clients) - 1;
-        //echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
-        //    , $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');
-
         $json = json_decode($msg);
 
         // Handle login
-        if ($json->a == "login") {
-            $this->rooms[$from->resourceId] = array("room"=>$json->room, "username"=>$json->username);
+        if ($json->a === "login") {
+            $this->setRoom($from, $json->room);
+            $this->setUsername($from, $json->username);
+
             $this->roomUsers[$json->room][$json->username] = $json->username;
 
             $currentMembers = "";
@@ -44,7 +40,7 @@ class Chat implements MessageComponentInterface {
             foreach ($this->clients as $client) {
                 if ($from !== $client 
                         // Ensure message is sent to the proper room.
-                        && $this->rooms[$from->resourceId]['room'] == $this->rooms[$client->resourceId]['room']) {
+                        && $this->getRoom($from) === $this->getRoom($client)) {
                     $o = array("status"=>"ok", "a"=>"message", "msg"=>"<span style=\"color:green;\">@" 
                             . $json->username . " joined</span> <span class=\"timestamp\">" 
                             . date("Y-m-d H:i:s") . "</span>");
@@ -54,12 +50,12 @@ class Chat implements MessageComponentInterface {
             return;
         }
 
-        if ($json->a == "message") {
+        if ($json->a === "message") {
             foreach ($this->clients as $client) {
+                // Don't send message to the sender.
                 if ($from !== $client 
                         // Ensure message is sent to the proper room.
-                        && $this->rooms[$from->resourceId]['room'] == $this->rooms[$client->resourceId]['room']) {
-                    // The sender is not the receiver, send to each client connected
+                        && $this->getRoom($from) === $this->getRoom($client)) {
                     $o = array("status"=>"ok", "a"=>"message", "msg"=>$json->msg);
                     $client->send(json_encode($o));
                 }
@@ -68,28 +64,26 @@ class Chat implements MessageComponentInterface {
     }
 
     public function onClose(ConnectionInterface $conn) {
-        // The connection is closed, remove it, as we can no longer send it messages
         $this->clients->detach($conn);
 
-        $key = array_search($this->rooms[$conn->resourceId]['username'], 
-                $this->roomUsers[$this->rooms[$conn->resourceId]['room']]);
+        $key = array_search($this->getUsername($conn), 
+                $this->roomUsers[$this->getRoom($conn)]);
         $room = null;
         $username = null;
         if ($key) {
-            $room = $this->rooms[$conn->resourceId]['room'];
-            $username = $this->rooms[$conn->resourceId]['username'];
+            $room = $this->getRoom($conn);
+            $username = $this->getUsername($conn);
             unset($this->roomUsers[$this->rooms[$conn->resourceId]['room']][$key]);
             unset($this->rooms[$conn->resourceId]);
         }
 
-        //echo "Connection {$conn->resourceId} has disconnected\n";
         if (isset($room) && isset($username)) {
             foreach ($this->clients as $client) {
                 $o = array("status"=>"ok", "a"=>"message", 
                         "msg"=>"<span style=\"color:red;\">@" 
                         . $username . " disconnected</span> <span class=\"timestamp\">" 
                         . date("Y-m-d H:i:s") . "</span>");
-                if ($this->rooms[$client->resourceId]['room'] == $room) {
+                if ($this->getRoom($client) === $room) {
                     $client->send(json_encode($o));
                 }
             }
@@ -97,8 +91,23 @@ class Chat implements MessageComponentInterface {
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e) {
-        //echo "An error has occurred: {$e->getMessage()}\n";
-
         $conn->close();
     }
+
+    public function getRoom($client) {
+        return $this->rooms[$client->resourceId]['room'];
+    }
+
+    public function setRoom($client, $room) {
+        $this->rooms[$client->resourceId]['room'] = $room;
+    }
+
+    public function getUsername($client) {
+        return $this->rooms[$client->resourceId]['username'];
+    }
+
+    public function setUsername($client, $username) {
+        $this->rooms[$client->resourceId]['username'] = $username;
+    }
+
 }
