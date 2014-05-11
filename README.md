@@ -38,6 +38,7 @@ As this is an alpha release there is much refactoring and testing to do.
 * On connection lost message is sent to users. Need to make sure only the connected room is notified.
 * Logout link.
 * Don't allow duplicate usernames.
+* Ponder settings such as sounds only when name mentioned. Settings would only persist in cookies.
 * Better room and username validation. Currently room and user names aren't very restrictive.
 * Verify all communication is secure.
 * Secure rooms
