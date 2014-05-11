@@ -16,7 +16,7 @@ class Chat implements MessageComponentInterface {
         // Store the new connection to send messages to later
         $this->clients->attach($conn);
 
-        echo "New connection! ({$conn->resourceId})\n";
+        //echo "New connection! ({$conn->resourceId})\n";
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
@@ -37,7 +37,7 @@ class Chat implements MessageComponentInterface {
             }
             $currentMembers = rtrim($currentMembers, ", ");
             $currentMembersObj = array("status"=>"ok", "a"=>"message", 
-                    "msg"=>"<strong>Current room members:</strong> {$currentMembers} <span class=\"timestamp\">" 
+                    "msg"=>"<strong style=\"color:green;\">Online</strong> {$currentMembers} <span class=\"timestamp\">" 
                     . date("Y-m-d H:i:s") . "</span>");
             $from->send(json_encode($currentMembersObj));
 
@@ -46,7 +46,7 @@ class Chat implements MessageComponentInterface {
                         // Ensure message is sent to the proper room.
                         && $this->rooms[$from->resourceId]['room'] == $this->rooms[$client->resourceId]['room']) {
                     $o = array("status"=>"ok", "a"=>"message", "msg"=>"<span style=\"color:green;\">@" 
-                            . $json->username . " just joined the room.</span> <span class=\"timestamp\">" 
+                            . $json->username . " joined</span> <span class=\"timestamp\">" 
                             . date("Y-m-d H:i:s") . "</span>");
                     $client->send(json_encode($o));
                 }
@@ -71,12 +71,12 @@ class Chat implements MessageComponentInterface {
         // The connection is closed, remove it, as we can no longer send it messages
         $this->clients->detach($conn);
 
-        echo "Connection {$conn->resourceId} has disconnected\n";
+        //echo "Connection {$conn->resourceId} has disconnected\n";
         foreach ($this->clients as $client) {
             $o = array("status"=>"ok", "a"=>"message", 
                     "msg"=>"<span style=\"color:red;\">@" 
                     . $this->rooms[$conn->resourceId]['username'] 
-                    . " has disconnected.</span> <span class=\"timestamp\">" 
+                    . " disconnected</span> <span class=\"timestamp\">" 
                     . date("Y-m-d H:i:s") . "</span>");
             $key = array_search($this->rooms[$conn->resourceId]['username'], 
                     $this->roomUsers[$this->rooms[$conn->resourceId]['room']]);
@@ -89,7 +89,7 @@ class Chat implements MessageComponentInterface {
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e) {
-        echo "An error has occurred: {$e->getMessage()}\n";
+        //echo "An error has occurred: {$e->getMessage()}\n";
 
         $conn->close();
     }
