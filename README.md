@@ -37,6 +37,7 @@ As this is an alpha release there is much refactoring and testing to do.
 * Admin room for sending global messages.
 * On connection lost message is sent to users. Need to make sure only the connected room is notified.
 * Logout link.
+* Fix auto-scroll on new messages. Will be annoying to scroll while reading previous messages. Auto-scroll only on your own messages. Received messages should not cause scroll.
 * Don't allow duplicate usernames.
 * Ponder settings such as sounds only when name mentioned. Settings would only persist in cookies.
 * Better room and username validation. Currently room and user names aren't very restrictive.
