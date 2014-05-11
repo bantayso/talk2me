@@ -20,8 +20,10 @@ class Chat implements MessageComponentInterface {
     public function onMessage(ConnectionInterface $from, $msg) {
         $json = json_decode($msg);
 
-        // Handle login
         if ($json->a === "login") {
+
+            // Handle login
+
             $this->setRoom($from, $json->room);
             $this->setUsername($from, $json->username);
 
@@ -47,10 +49,13 @@ class Chat implements MessageComponentInterface {
                     $client->send(json_encode($o));
                 }
             }
-            return;
-        }
 
-        if ($json->a === "message") {
+            return;
+
+        } else if ($json->a === "message") {
+
+            // Handle sending messages.
+
             foreach ($this->clients as $client) {
                 // Don't send message to the sender.
                 if ($from !== $client 
@@ -60,6 +65,9 @@ class Chat implements MessageComponentInterface {
                     $client->send(json_encode($o));
                 }
             }
+
+            return;
+
         }
     }
 
