@@ -63,7 +63,7 @@ function login() {
 
         $form = "<form role=\"form\"><input name=\"message\" id=\"message\" "
                 + "type=\"text\" class=\"form-control\" "
-                + "placeholder=\"@" + username + " #" + room + " type msg [enter]\" /></form>";
+                + "placeholder=\"@" + username + " #" + room + " [enter]\" /></form>";
         $("#login-form").replaceWith($form);
         $("#message").focus();
         $("#message").keypress(function (e) {
