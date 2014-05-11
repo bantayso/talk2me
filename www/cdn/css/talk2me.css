@@ -1,15 +1,9 @@
-@font-face {
-    font-family:"engel";
-    src:url("engel_light_ltd.ttf");
-}
-
 body, input {
-    font-family:"engel", sans-serif;
-    font-weight:250;
+    font-weight:200;
 }
 
 strong {
-    font-weight:900;
+    font-weight:400;
 }
 
 footer {
