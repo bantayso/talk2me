@@ -30,6 +30,7 @@ function sendMessage(msg) {
     var jsonMsg = "{\"a\": \"message\", \"msg\": \"" + msg.replace(/"/g, "\\\"") + "\"}";
     conn.send(jsonMsg);
     appendMessage(msg);
+    $("html, body").animate({ scrollTop: $(document).height() }, 1000);
 }
 
 function handleMessage(json) {
@@ -48,7 +49,6 @@ function handleMessage(json) {
 
 function appendMessage(msg) {
     $(".messages").append("<div class=\"well well-sm\">" + msg + "</div>");
-    $("html, body").animate({ scrollTop: $(document).height() }, 1000);
 }
 
 function login() {
