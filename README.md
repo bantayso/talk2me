@@ -34,6 +34,7 @@ TODO
 ====
 As this is an alpha release there is much refactoring and testing to do.
 
+* When connection is lost, notify the users and remove the message input.
 * Maintain room and users status outside of Chat.php. It doesn't seem to maintain state.
 * Admin room for sending global messages.
 * On connection lost message is sent to users. Need to make sure only the connected room is notified.
