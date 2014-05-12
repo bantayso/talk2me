@@ -66,6 +66,7 @@ function login() {
         $form = "<form role=\"form\"><input name=\"message\" id=\"message\" "
                 + "type=\"text\" class=\"form-control\" "
                 + "placeholder=\"@" + username + " #" + room + " [enter]\" /></form>";
+        $form += "<button class=\"logout btn btn-danger\" id=\"logout\">logout</button>";
         $("#login-form").replaceWith($form);
         $("#message").focus();
         $("#message").keypress(function (e) {
@@ -77,10 +78,23 @@ function login() {
                 return false;
             }
         });
+        applyLogoutEvent();
     } else {
         alert("Please enter a username between 3-8 characters!");
         return false;
     }
+}
+
+function applyLogoutEvent() {
+    $("#logout").on("click", function() {
+        logout();
+    });
+}
+
+function logout() {
+    conn.send("{\"a\": \"logout\"}");
+    window.location.href = window.location.protocol + "//" 
+            + window.location.hostname + window.location.pathname;
 }
 
 function strip_tags(input, allowed) {
@@ -148,6 +162,8 @@ $(document).ready(function() {
             return false;
         }
     });
+
+    applyLogoutEvent();
 
     $(window).on("unload", function() {
         return confirm("Are you sure you want to logout?");

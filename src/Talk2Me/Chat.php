@@ -70,28 +70,33 @@ class Chat implements MessageComponentInterface {
 
             return;
 
+        } else if ($json->a === "message") {
         }
     }
 
-    public function onClose(ConnectionInterface $conn) {
-        $this->clients->detach($conn);
+    public function logout($client) {
+        $this->clients->detach($client);
 
-        $room = $this->getRoom($conn);
-        $username = $this->getUsername($conn);
+        $room = $this->getRoom($client);
+        $username = $this->getUsername($client);
 
-        $this->unsetRoomUserClient($conn);
+        $this->unsetRoomUserClient($client);
 
         if (isset($room) && isset($username)) {
-            foreach ($this->clients as $client) {
+            foreach ($this->clients as $theClient) {
                 $o = array("status"=>"ok", "a"=>"message", 
                         "msg"=>"<span style=\"color:red;\">@" 
                         . $username . " disconnected</span> <span class=\"timestamp\">" 
                         . date("Y-m-d H:i:s") . "</span>");
-                if ($this->getRoom($client) === $room) {
-                    $client->send(json_encode($o));
+                if ($this->getRoom($theClient) === $room) {
+                    $theClient->send(json_encode($o));
                 }
             }
         }
+    }
+
+    public function onClose(ConnectionInterface $conn) {
+        $this->logout($conn);
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e) {
