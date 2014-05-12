@@ -116,6 +116,7 @@ function startConnection(room, username) {
     };
 
     conn.onclose = function(e) {
+        logout();
     };
 
     conn.onmessage = function(e) {
