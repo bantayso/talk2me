@@ -69,6 +69,7 @@ function handleMessage(json) {
                 });
                 applyLogoutEvent();
                 applyWhoEvent();
+                $(".btn-tooltip").tooltip();
             }
         }
     }
@@ -166,10 +167,8 @@ function startConnection(room, username) {
 }
 
 function reConnect() {
-    console.log("reConnectA: connected: " + connected);
     conn = new WebSocket(webSocketUrl);
     conn.onopen = function(e) { connected = true; };
-    console.log("reConnectB: connected: " + connected);
     if (connected) {
         if ($("#room").size() < 1) {
             $("body").append("<input id=\"room\" type=\"hidden\" />");
@@ -184,7 +183,6 @@ function reConnect() {
 }
 
 function init() {
-    console.log("init started");
     var hash = window.location.hash;
     room = "";
     username = "";
@@ -211,8 +209,6 @@ $(document).ready(function() {
     isLoggedIn = false;
 
     init();
-
-    $(".btn-tooltip").tooltip();
 
     $("#room").focus();
 
