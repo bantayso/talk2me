@@ -149,7 +149,11 @@ function logout() {
 
 function applyChangeStatusEvent() {
     $(".chg-status").on("click", function() {
-        $("#current-status").text($(this).text());
+        var newStatus = $(this).text();
+        $("#current-status").text(newStatus);
+        var request = {"a": "statusChange", "status": newStatus};
+        console.log("Sending status change: " + newStatus);
+        conn.send(JSON.stringify(request));
     });
 }
 

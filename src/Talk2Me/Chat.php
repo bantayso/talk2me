@@ -37,7 +37,7 @@ class Chat implements MessageComponentInterface {
         } else if ($json->a === "message") {
 
             // Handle sending messages.
-            $this->handleMessage($from, $json, $msg);
+            $this->handleMessage($from, $json);
 
             return;
 
@@ -45,6 +45,14 @@ class Chat implements MessageComponentInterface {
 
             // Returns who is online
             $this->whoIsOnline($from);
+
+            return;
+
+        } else if ($json->a === "statusChange") {
+
+            $this->setUserStatus($from, $json->status);
+            $json->msg = "@" . $this->getUsername($from) . " went " . $json->status;
+            $this->handleMessage($from, $json, "status-message");
 
             return;
 
@@ -59,14 +67,14 @@ class Chat implements MessageComponentInterface {
             $from->send(json_encode($response));
             return;
         } else {
-            $this->setUsers($json->username);
+            $this->setUsers($from, $json->username);
 
             $response = array("status"=>"ok", "a"=>"login", "isLoggedIn"=>false);
             $from->send(json_encode($response));
 
             $this->setRoom($from, $json->room);
             $this->setUsername($from, $json->username);
-
+            $this->setUserStatus($from, "Free");
             $this->roomUsers[$json->room][$json->username] = $json->username;
 
             $this->whoIsOnline($from);
@@ -85,13 +93,16 @@ class Chat implements MessageComponentInterface {
         }
     }
 
-    function handleMessage($from, $json, $msg) {
+    function handleMessage($from, $json, $t=null) {
+        if (!isset($t)) {
+            $t = "message";
+        }
         foreach ($this->clients as $client) {
             // Don't send message to the sender.
             if ($from !== $client 
                     // Ensure message is sent to the proper room.
                     && $this->getRoom($from) === $this->getRoom($client)) {
-                $o = array("status"=>"ok", "a"=>"message", "t"=>"message", 
+                $o = array("status"=>"ok", "a"=>"message", "t"=>$t, 
                         "msg"=>$json->msg);
                 $client->send(json_encode($o));
             }
@@ -102,7 +113,13 @@ class Chat implements MessageComponentInterface {
         $room = $this->getRoom($from);
         $currentMembers = "";
         foreach ($this->roomUsers[$room] as $username) {
-            $currentMembers .= "@{$username}, ";
+            $resourceId = array_search($username, $this->users);
+            $status = $this->rooms[$resourceId]['status'];
+            if ($status === "Free") {
+                $currentMembers .= "@{$username}, ";
+            } else {
+                $currentMembers .= "@{$username}<span class=\"user-status\">({$status})</span>, ";
+            }
         }
         $currentMembers = rtrim($currentMembers, ", ");
         $currentMembersObj = array("status"=>"ok", "a"=>"message", "t"=>"status",
@@ -112,7 +129,6 @@ class Chat implements MessageComponentInterface {
     }
 
     public function logout($client) {
-
         $room = $this->getRoom($client);
         $username = $this->getUsername($client);
         $this->removeFromUsers($username);
@@ -139,6 +155,14 @@ class Chat implements MessageComponentInterface {
     public function onError(ConnectionInterface $conn, \Exception $e) {
         $this->logout($conn);
         $conn->close();
+    }
+
+    public function getUserStatus($client) {
+        return $this->rooms[$client->resourceId]['status'];
+    }
+
+    public function setUserStatus($client, $status) {
+        $this->rooms[$client->resourceId]['status'] = $status;
     }
 
     public function getRoom($client) {
@@ -169,8 +193,8 @@ class Chat implements MessageComponentInterface {
         }
     }
 
-    public function setUsers($username) {
-        $this->users[] = $username;
+    public function setUsers($client, $username) {
+        $this->users[$client->resourceId] = $username;
     }
 
     public function getUsers() {

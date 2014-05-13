@@ -2,6 +2,12 @@ body, input {
     font-weight:200;
 }
 
+@media(min-width:42em) {
+    .container {
+        max-width:42em;
+    }
+}
+
 strong {
     font-weight:400;
 }
@@ -41,8 +47,7 @@ h1, h2, h3, h4, h5, h6 {
     cursor:pointer;
 }
 
-@media(min-width:42em) {
-    .container {
-        max-width:42em;
-    }
+.user-status {
+    font-family:monospace;
+    color:gray;
 }
