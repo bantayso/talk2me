@@ -115,9 +115,11 @@ function appendMessage(msg) {
 }
 
 function login() {
+    console.log("reConnect: running login()");
     room = $("#room").val();
     username = $("#username").val();
     if (undefined !== username && username.length > 2 && username.length < 9) {
+        console.log("reConnect: username was good.");
         isLoggedIn = true;
 
         if (undefined !== room && room.length > 1) {
@@ -207,6 +209,7 @@ function startConnection(room, username) {
 
         conn.onopen = function(e) {
             connected = true;
+            reConnecting = false;
             loginToRoom(room, username);
         };
 
@@ -214,11 +217,13 @@ function startConnection(room, username) {
             isLoggedIn = false;
             connected = false;
             $("#message").remove();
-            $("footer").html("<div id=\"login-form\"><!--add form on reconnect--></div>");
-            appendMessage("<span class=\"connection-lost\"><strong style=\"color:red;\">Connection lost.</strong> "
-                    + "<strong>Refresh to reconnect.</strong> If this persists please "
-                    + "contact your system administrator.</span>");
-            reConnect();
+            if (!reConnecting) {
+                $("footer").html("<div id=\"login-form\"><!--add form on reconnect--></div>");
+                appendMessage("<span class=\"connection-lost\"><strong style=\"color:red;\">Connection lost.</strong> "
+                        + "<strong>Refresh to reconnect.</strong> If this persists please "
+                        + "contact your system administrator.</span>");
+                reConnect();
+            }
         };
 
         conn.onmessage = function(e) {
@@ -232,15 +237,10 @@ function startConnection(room, username) {
     }
 }
 
+reConnecting = false;
 function reConnect() {
-    conn = new WebSocket(webSocketUrl);
+    reConnecting = true;
     if (!connected) {
-        conn.onopen = function(e) {
-            console.log("reConnect: opened");
-            connected = true;
-        };
-    }
-    if (connected) {
         console.log("reConnect: connected - run init()");
         if ($("#room").size() < 1) {
             $("body").append("<input id=\"room\" type=\"hidden\" />");
@@ -249,7 +249,6 @@ function reConnect() {
             $("body").append("<input id=\"username\" type=\"hidden\" />");
         }
         init();
-    } else {
         console.log("reConnect: not connected, run reConnect() again");
         setTimeout("reConnect()", 2000);
     }
