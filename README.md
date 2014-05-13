@@ -69,9 +69,8 @@ As this is an alpha release there is much refactoring and testing to do.
 
 * Multiple room support.
 * On refresh your username is not always released.
-* Don't allow duplicate usernames.
 * Better room and username validation. Currently room and user names aren't very restrictive.
-* Admin room for sending global messages.
+* Admin room for sending global messages. (This may now be up to implementation using CommandPlugin)
 * Different sounds for messages, login, logout, ...
 * Ponder settings such as sounds only when name mentioned. Settings would only persist in cookies.
 * Verify all communication is secure.
