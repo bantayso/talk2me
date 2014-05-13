@@ -8,9 +8,11 @@ class Chat implements MessageComponentInterface {
     protected $clients;
     private $rooms;
     private $roomUsers;
+    private $users;
 
     public function __construct() {
         $this->clients = new \SplObjectStorage;
+        $this->users = array();
     }
 
     public function onOpen(ConnectionInterface $conn) {
@@ -23,21 +25,46 @@ class Chat implements MessageComponentInterface {
         if ($json->a === "login") {
 
             // Handle login
+            $this->handleLogin($from, $json, $msg);
+
+            return;
+
+        } else if ($json->a === "message") {
+
+            // Handle sending messages.
+            $this->handleMessage($from, $json, $msg);
+
+            return;
+
+        } else if ($json->a === "who") {
+
+            // Returns who is online
+            $this->whoIsOnline($from);
+
+            return;
+
+        }
+    }
+
+    public function handleLogin($from, $json, $msg) {
+        $isLoggedIn = $this->isLoggedIn($json->username);
+
+        if ($isLoggedIn) {
+            $response = array("status"=>"ok", "a"=>"login", "isLoggedIn"=>true);
+            $from->send(json_encode($response));
+            return;
+        } else {
+            $this->setUsers($json->username);
+
+            $response = array("status"=>"ok", "a"=>"login", "isLoggedIn"=>false);
+            $from->send(json_encode($response));
 
             $this->setRoom($from, $json->room);
             $this->setUsername($from, $json->username);
 
             $this->roomUsers[$json->room][$json->username] = $json->username;
 
-            $currentMembers = "";
-            foreach ($this->roomUsers[$json->room] as $username) {
-                $currentMembers .= "@{$username}, ";
-            }
-            $currentMembers = rtrim($currentMembers, ", ");
-            $currentMembersObj = array("status"=>"ok", "a"=>"message", "t"=>"status",
-                    "msg"=>"<strong style=\"color:green;\">Online</strong> {$currentMembers} <span class=\"timestamp\">" 
-                    . date("Y-m-d H:i:s") . "</span>");
-            $from->send(json_encode($currentMembersObj));
+            $this->whoIsOnline($from);
 
             foreach ($this->clients as $client) {
                 if ($from !== $client 
@@ -50,28 +77,33 @@ class Chat implements MessageComponentInterface {
                     $client->send(json_encode($o));
                 }
             }
-
-            return;
-
-        } else if ($json->a === "message") {
-
-            // Handle sending messages.
-
-            foreach ($this->clients as $client) {
-                // Don't send message to the sender.
-                if ($from !== $client 
-                        // Ensure message is sent to the proper room.
-                        && $this->getRoom($from) === $this->getRoom($client)) {
-                    $o = array("status"=>"ok", "a"=>"message", "t"=>"message", 
-                            "msg"=>$json->msg);
-                    $client->send(json_encode($o));
-                }
-            }
-
-            return;
-
-        } else if ($json->a === "message") {
         }
+    }
+
+    function handleMessage($from, $json, $msg) {
+        foreach ($this->clients as $client) {
+            // Don't send message to the sender.
+            if ($from !== $client 
+                    // Ensure message is sent to the proper room.
+                    && $this->getRoom($from) === $this->getRoom($client)) {
+                $o = array("status"=>"ok", "a"=>"message", "t"=>"message", 
+                        "msg"=>$json->msg);
+                $client->send(json_encode($o));
+            }
+        }
+    }
+
+    public function whoIsOnline($from) {
+        $room = $this->getRoom($from);
+        $currentMembers = "";
+        foreach ($this->roomUsers[$room] as $username) {
+            $currentMembers .= "@{$username}, ";
+        }
+        $currentMembers = rtrim($currentMembers, ", ");
+        $currentMembersObj = array("status"=>"ok", "a"=>"message", "t"=>"status",
+                "msg"=>"<strong style=\"color:green;\">Online</strong> {$currentMembers} <span class=\"timestamp\">" 
+                . date("Y-m-d H:i:s") . "</span>");
+        $from->send(json_encode($currentMembersObj));
     }
 
     public function logout($client) {
@@ -79,6 +111,8 @@ class Chat implements MessageComponentInterface {
 
         $room = $this->getRoom($client);
         $username = $this->getUsername($client);
+
+        $this->removeFromUsers($username);
 
         $this->unsetRoomUserClient($client);
 
@@ -100,6 +134,7 @@ class Chat implements MessageComponentInterface {
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e) {
+        $this->logout($conn);
         $conn->close();
     }
 
@@ -120,11 +155,37 @@ class Chat implements MessageComponentInterface {
     }
 
     public function unsetRoomUserClient($client) {
-        $key = array_search($this->getUsername($client), 
-                $this->roomUsers[$this->getRoom($client)]);
+        $key = false;
+        if (is_array($this->roomUsers[$this->getRoom($client)])) {
+            $key = array_search($this->getUsername($client), 
+                    $this->roomUsers[$this->getRoom($client)]);
+        }
         if ($key) {
             unset($this->roomUsers[$this->rooms[$client->resourceId]['room']][$key]);
             unset($this->rooms[$client->resourceId]);
+        }
+    }
+
+    public function setUsers($username) {
+        $this->users[] = $username;
+    }
+
+    public function getUsers() {
+        return $this->users;
+    }
+
+    public function removeFromUsers($username) {
+        $key = array_search($username, $this->users);
+        if ($key) {
+            unset($this->users[$key]);
+        }
+    }
+
+    public function isLoggedIn($username) {
+        if (in_array($username, $this->users)) {
+            return true;
+        } else {
+            return false;
         }
     }
 

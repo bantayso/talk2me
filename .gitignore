@@ -1,4 +1,8 @@
 vendor/
 composer.lock
 config.js
+config.php
 index.php
+vi.project
+sync_prd.bash
+compile_js.bash

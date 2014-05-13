@@ -26,7 +26,13 @@ h1, h2, h3, h4, h5, h6 {
     font-weight:100;
 }
 
-.logout {
+.btn-people, .logout {
     margin-top:8px;
     margin-bottom:8px;
+    margin-right:8px;
+}
+
+.btn-people {
+    width:1em;
+    height:1em;
 }

@@ -27,8 +27,8 @@ function sendMessage(msg) {
             + " <span class=\"timestamp\">" + getTimestamp() + "</span>";
     msg = strip_tags(msg, "<strong><em><table><thead><tbody><tr><th><td>"
             + "<img><br><br/><a><p><div><ul><li><ol><span><hr><hr/><dd><dl><dt>");
-    var jsonMsg = "{\"a\": \"message\", \"msg\": \"" + msg.replace(/"/g, "\\\"") + "\"}";
-    conn.send(jsonMsg);
+    var request = {"a": "message", "msg": msg};
+    conn.send(JSON.stringify(request));
     appendMessage(msg);
 }
 
@@ -41,6 +41,34 @@ function handleMessage(json) {
             appendMessage(jsonObj.msg);
             if (!windowFocused && jsonObj.t === "message") {
                 Tinycon.setBubble(++messageCount);
+            }
+        } else if (jsonObj.a === "login") {
+            if (jsonObj.isLoggedIn) {
+                alert("That username has already been taken.");
+            } else {
+                // Let's not show this form stuff until we get a response back.
+                $form = "<form role=\"form\"><input name=\"message\" id=\"message\" "
+                        + "type=\"text\" class=\"form-control\" "
+                        + "placeholder=\"@" + username + " #" + room + " [enter]\" /></form>";
+                $form += "<button class=\"logout btn btn-primary btn-sm btn-tooltip\" "
+                        + "title=\"Who is online?\" id=\"who\">"
+                        + "<span class=\"glyphicon glyphicon-user\"></span></button>";
+                $form += "<button class=\"logout btn btn-danger btn-sm btn-tooltip\" "
+                        + "id=\"logout\" title=\"Logout of room\">"
+                        + "<span class=\"glyphicon glyphicon-log-out\"></span></button>";
+                $("#login-form").replaceWith($form);
+                $("#message").focus();
+                $("#message").keypress(function (e) {
+                    if (e.which == 13) {
+                        e.preventDefault();
+                        sendMessage($("#message").val());
+                        $("#message").val('');
+                        $("#message").focus();
+                        return false;
+                    }
+                });
+                applyLogoutEvent();
+                applyWhoEvent();
             }
         }
     }
@@ -60,25 +88,10 @@ function login() {
         } else {
             room = "public";
         }
-        window.location.hash = room + "@" + username;
-        startConnection(room, username);
 
-        $form = "<form role=\"form\"><input name=\"message\" id=\"message\" "
-                + "type=\"text\" class=\"form-control\" "
-                + "placeholder=\"@" + username + " #" + room + " [enter]\" /></form>";
-        $form += "<button class=\"logout btn btn-danger\" id=\"logout\">logout</button>";
-        $("#login-form").replaceWith($form);
-        $("#message").focus();
-        $("#message").keypress(function (e) {
-            if (e.which == 13) {
-                e.preventDefault();
-                sendMessage($("#message").val());
-                $("#message").val('');
-                $("#message").focus();
-                return false;
-            }
-        });
-        applyLogoutEvent();
+        window.location.hash = room + "@" + username;
+
+        startConnection(room, username);
     } else {
         alert("Please enter a username between 3-8 characters!");
         return false;
@@ -92,9 +105,23 @@ function applyLogoutEvent() {
 }
 
 function logout() {
-    conn.send("{\"a\": \"logout\"}");
+    isLoggedIn = false;
+    var request = {"a": "logout"};
+    conn.send(JSON.stringify(request));
     window.location.href = window.location.protocol + "//" 
             + window.location.hostname + window.location.pathname;
+}
+
+function applyWhoEvent() {
+    $("#who").on("click", function() {
+        who();
+    });
+}
+
+function who() {
+    var request = {"a": "who"};
+    conn.send(JSON.stringify(request));
+    $("#message").focus();
 }
 
 function strip_tags(input, allowed) {
@@ -108,15 +135,27 @@ function strip_tags(input, allowed) {
     });
 }
 
+connected = false;
 function startConnection(room, username) {
     conn = new WebSocket(webSocketUrl);
 
     conn.onopen = function(e) {
-        conn.send("{\"a\": \"login\", \"room\":\"" + room + "\", \"username\": \"" + username + "\"}");
+        connected = true;
+        var request = {"a": "login", "room": room, "username": username};
+        conn.send(JSON.stringify(request));
     };
 
     conn.onclose = function(e) {
-        logout();
+        isLoggedIn = false;
+        connected = false;
+        $("#message").remove();
+        $("footer").html("<div id=\"login-form\"><!--add form on reconnect--></div>");
+        appendMessage("<strong style=\"color:red;\">Connection lost.</strong> "
+                + "<strong>Refresh to reconnect.</strong> If this persists please "
+                + "contact your system administrator.");
+        if (!connected) {
+            reConnect();
+        }
     };
 
     conn.onmessage = function(e) {
@@ -126,7 +165,26 @@ function startConnection(room, username) {
     };
 }
 
+function reConnect() {
+    console.log("reConnectA: connected: " + connected);
+    conn = new WebSocket(webSocketUrl);
+    conn.onopen = function(e) { connected = true; };
+    console.log("reConnectB: connected: " + connected);
+    if (connected) {
+        if ($("#room").size() < 1) {
+            $("body").append("<input id=\"room\" type=\"hidden\" />");
+        }
+        if ($("#username").size() < 1) {
+            $("body").append("<input id=\"username\" type=\"hidden\" />");
+        }
+        init();
+    } else {
+        setTimeout("reConnect()", 2000);
+    }
+}
+
 function init() {
+    console.log("init started");
     var hash = window.location.hash;
     room = "";
     username = "";
@@ -153,6 +211,8 @@ $(document).ready(function() {
     isLoggedIn = false;
 
     init();
+
+    $(".btn-tooltip").tooltip();
 
     $("#room").focus();
 
