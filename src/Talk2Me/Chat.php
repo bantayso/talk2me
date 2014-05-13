@@ -104,7 +104,12 @@ class Chat implements MessageComponentInterface {
 
         if (class_exists("Talk2Me\CommandPlugin")) {
             $cp = new \Talk2Me\CommandPlugin;
-            $cp->execute($from, $json, $t);
+            $executed = $cp->execute($this, $from, $json, $t);
+            // If a command was executed it is assumed to have been sent back to $from.
+            // We don't send commands to clients unless we do it in execute() explicity;
+            if ($executed) {
+                return;
+            }
         }
 
         foreach ($this->clients as $client) {
@@ -119,7 +124,7 @@ class Chat implements MessageComponentInterface {
         }
     }
 
-    public function whoIsOnline($from) {
+    public function getRoomMembersMessage($from) {
         $room = $this->getRoom($from);
         $currentMembers = "";
         foreach ($this->roomUsers[$room] as $username) {
@@ -132,9 +137,13 @@ class Chat implements MessageComponentInterface {
             }
         }
         $currentMembers = rtrim($currentMembers, ", ");
-        $currentMembersObj = array("status"=>"ok", "a"=>"message", "t"=>"status",
-                "msg"=>"<strong style=\"color:green;\">Online</strong> {$currentMembers} <span class=\"timestamp\">" 
-                . date("Y-m-d H:i:s") . "</span>");
+        return "<strong style=\"color:green;\">Online</strong> {$currentMembers} <span class=\"timestamp\">" 
+                . date("Y-m-d H:i:s") . "</span>";
+    }
+
+    public function whoIsOnline($from) {
+        $msg = $this->getRoomMembersMessage($from);
+        $currentMembersObj = array("status"=>"ok", "a"=>"message", "t"=>"status", "msg"=>$msg);
         $from->send(json_encode($currentMembersObj));
     }
 

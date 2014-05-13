@@ -43,13 +43,17 @@ return the message will be sent to clients connected to the room.
 
 In the example below if you send the message `/samplecommand` only you will receive a message back saying `Executing sample command`.
 
+You must `return true` if a command was executed and you only want to send the message to `$from`.
+
+The `execute()` function should `return false` in all other cases.
+
     public function execute($from, $json, $t) {
         if (preg_match("/\/samplecommand/", $json->msg)) {
             $o = array("status"=>"ok", "a"=>"message", "t"=>$t,
                     "msg"=>"Executing sample command");
             $from->send(json_encode($o));
         }
-        return;
+        return true;
     }
 
 You can have any number of command that do just about anything you want. For example you might want a command such as `/weather 90210` that
