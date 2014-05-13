@@ -158,13 +158,17 @@ function logout() {
 function applyChangeStatusEvent() {
     $(".chg-status").on("click", function() {
         var newStatus = $(this).text();
-        $("#current-status").text(newStatus);
-        var request = {"a": "statusChange", "status": newStatus};
-        console.log("Sending status change: " + newStatus);
-        conn.send(JSON.stringify(request));
+        sendChangeStatus(newStatus);
         $("#message").focus();
         scrollToBottom();
     });
+}
+
+function sendChangeStatus(newStatus) {
+    $("#current-status").text(newStatus);
+    var request = {"a": "statusChange", "status": newStatus};
+    console.log("Sending status change: " + newStatus);
+    conn.send(JSON.stringify(request));
 }
 
 function applyWhoEvent() {
@@ -254,7 +258,29 @@ function reConnect() {
     }
 }
 
+idle = false;
+lastActive = Math.round((new Date()).getTime() / 1000);
+function autoSetStatus() {
+    var now = Math.round((new Date()).getTime() / 1000);
+    var elapsed = now - lastActive;
+    if (!idle && elapsed > 15) {
+        console.log("You've been idle for > 15 seconds. " + elapsed + " to be exact.");
+        sendChangeStatus("Idle");
+        idle = true;
+    }
+    setTimeout("autoSetStatus()", 5000);
+}
+
+function resetIdleStatus() {
+    if (idle) {
+        idle = false;
+        lastActive = Math.round((new Date()).getTime() / 1000);
+        sendChangeStatus("Free");
+    }
+}
+
 function init() {
+    autoSetStatus();
     var hash = window.location.hash;
     room = "";
     username = "";
@@ -267,17 +293,8 @@ function init() {
     }
 }
 
-windowFocused = true;
-messageCount = 0;
-$(window).focus(function() {
-    windowFocused = true;
-    messageCount = 0;
-    Tinycon.setBubble(messageCount);
-}).blur(function() {
-    windowFocused = false;
-});
-
 $(document).ready(function() {
+
     isLoggedIn = false;
 
     init();
@@ -297,4 +314,24 @@ $(document).ready(function() {
     $(window).on("unload", function() {
         return confirm("Are you sure you want to logout?");
     });
+
+    windowFocused = true;
+    messageCount = 0;
+    $(window).focus(function() {
+        windowFocused = true;
+        messageCount = 0;
+        Tinycon.setBubble(messageCount);
+        if (idle) {
+            resetIdleStatus();
+        }
+    }).blur(function() {
+        windowFocused = false;
+    });
+
+    $(window).on("mousemove, scroll, resize", function() {
+        if (idle) {
+            resetIdleStatus();
+        }
+    });
+
 });
