@@ -34,6 +34,8 @@ TODO
 ====
 As this is an alpha release there is much refactoring and testing to do.
 
+* Multiple room support.
+* On refresh your username is not always released.
 * Don't allow duplicate usernames.
 * Better room and username validation. Currently room and user names aren't very restrictive.
 * Admin room for sending global messages.

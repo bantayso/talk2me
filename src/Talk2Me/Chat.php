@@ -13,6 +13,11 @@ class Chat implements MessageComponentInterface {
     public function __construct() {
         $this->clients = new \SplObjectStorage;
         $this->users = array();
+        foreach ($this->users as $k=>$v) {
+            unset($this->users[$k]);
+        }
+        unset($this->rooms);
+        unset($this->roomUsers);
     }
 
     public function onOpen(ConnectionInterface $conn) {
@@ -107,14 +112,12 @@ class Chat implements MessageComponentInterface {
     }
 
     public function logout($client) {
-        $this->clients->detach($client);
 
         $room = $this->getRoom($client);
         $username = $this->getUsername($client);
-
         $this->removeFromUsers($username);
-
         $this->unsetRoomUserClient($client);
+        $this->clients->detach($client);
 
         if (isset($room) && isset($username)) {
             foreach ($this->clients as $theClient) {

@@ -25,11 +25,21 @@ function sendMessage(msg) {
     }
     msg = "<strong>@" + username + "</strong> " + msg 
             + " <span class=\"timestamp\">" + getTimestamp() + "</span>";
+    // These are the allowed HTML tags in messages.
     msg = strip_tags(msg, "<strong><em><table><thead><tbody><tr><th><td>"
             + "<img><br><br/><a><p><div><ul><li><ol><span><hr><hr/><dd><dl><dt>");
     var request = {"a": "message", "msg": msg};
     conn.send(JSON.stringify(request));
     appendMessage(msg);
+}
+
+function removeErrorMessages() {
+    var errMsg = $("#error");
+    if (errMsg.size() > 0) {
+        errMsg.each(function(i, r) {
+            $(r).remove()
+        });
+    }
 }
 
 function handleMessage(json) {
@@ -44,11 +54,12 @@ function handleMessage(json) {
             }
         } else if (jsonObj.a === "login") {
             if (jsonObj.isLoggedIn) {
+                removeErrorMessages();
                 $("#login-form").prepend("<div id=\"error\"></div>");
                 $("#error").addClass("alert alert-warning fade in")
-                        .append("<button id=\"close\" class=\"glyphicon glyphicon-remove\"></button>");
+                        .append("<button id=\"close\">&times;</button>");
                 $("#close").addClass("close").attr({"type":"button", "data-dismiss":"alert"})
-                        .after("That username has already been taken.");
+                        .after("Username already taken");
             } else {
                 // Let's not show this form stuff until we get a response back.
                 $form = "<form role=\"form\"><input name=\"message\" id=\"message\" "
@@ -98,12 +109,10 @@ function login() {
 
         startConnection(room, username);
     } else {
-        if ($("#error").size() > 0) {
-            $("#error").remove();
-        }
+        removeErrorMessages();
         $("#login-form").prepend("<div id=\"error\"></div>");
         $("#error").addClass("alert alert-warning fade in")
-                .append("<button id=\"close\" class=\"glyphicon glyphicon-remove\"></button>");
+                .append("<button id=\"close\">&times;</button>");
         $("#close").addClass("close").attr({"type":"button", "data-dismiss":"alert"})
                 .after("Please enter a username between 3-8 characters!");;
         return false;
@@ -147,39 +156,49 @@ function strip_tags(input, allowed) {
     });
 }
 
+function loginToRoom(room, username) {
+    var request = {"a": "login", "room": room, "username": username};
+    conn.send(JSON.stringify(request));
+}
+
 connected = false;
 function startConnection(room, username) {
-    conn = new WebSocket(webSocketUrl);
+    if (!connected) {
+        conn = new WebSocket(webSocketUrl);
 
-    conn.onopen = function(e) {
-        connected = true;
-        var request = {"a": "login", "room": room, "username": username};
-        conn.send(JSON.stringify(request));
-    };
+        conn.onopen = function(e) {
+            connected = true;
+            loginToRoom(room, username);
+        };
 
-    conn.onclose = function(e) {
-        isLoggedIn = false;
-        connected = false;
-        $("#message").remove();
-        $("footer").html("<div id=\"login-form\"><!--add form on reconnect--></div>");
-        appendMessage("<strong style=\"color:red;\">Connection lost.</strong> "
-                + "<strong>Refresh to reconnect.</strong> If this persists please "
-                + "contact your system administrator.");
-        if (!connected) {
-            reConnect();
-        }
-    };
+        conn.onclose = function(e) {
+            isLoggedIn = false;
+            connected = false;
+            $("#message").remove();
+            $("footer").html("<div id=\"login-form\"><!--add form on reconnect--></div>");
+            appendMessage("<span class=\"connection-lost\"><strong style=\"color:red;\">Connection lost.</strong> "
+                    + "<strong>Refresh to reconnect.</strong> If this persists please "
+                    + "contact your system administrator.</span>");
+            if (!connected) {
+                reConnect();
+            }
+        };
 
-    conn.onmessage = function(e) {
-        if (isLoggedIn) {
-            handleMessage(e.data);
-        }
-    };
+        conn.onmessage = function(e) {
+            if (isLoggedIn) {
+                handleMessage(e.data);
+            }
+        };
+    } else {
+        loginToRoom(room, username);
+    }
 }
 
 function reConnect() {
     conn = new WebSocket(webSocketUrl);
-    conn.onopen = function(e) { connected = true; };
+    conn.onopen = function(e) {
+        connected = true;
+    };
     if (connected) {
         if ($("#room").size() < 1) {
             $("body").append("<input id=\"room\" type=\"hidden\" />");
