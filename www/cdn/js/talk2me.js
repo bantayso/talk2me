@@ -31,6 +31,8 @@ function sendMessage(msg) {
     var request = {"a": "message", "msg": msg};
     conn.send(JSON.stringify(request));
     appendMessage(msg);
+    // Scroll to bottom of page after typing message.
+    $("html, body").animate({ scrollTop: $(document).height() - $(window).height() });
 }
 
 function removeErrorMessages() {
@@ -65,9 +67,20 @@ function handleMessage(json) {
                 $form = "<form role=\"form\"><input name=\"message\" id=\"message\" "
                         + "type=\"text\" class=\"form-control\" "
                         + "placeholder=\"@" + username + " #" + room + " [enter]\" /></form>";
+                // Status button
+                $form += "<div class=\"btn-group btn-status\"><button "
+                        + "type=\"button\" class=\"btn btn-default btn-sm dropdown-toggle\" "
+                        + "data-toggle=\"dropdown\"><span id=\"current-status\">Free</span> "
+                        + "<span class=\"caret\"></span></button><ul class=\"dropdown-menu\" "
+                        + "role=\"menu\"><li><a class=\"cursor chg-status\">Free</a></li><li>"
+                        + "<a class=\"cursor chg-status\">Away</a></li><li>"
+                        + "<a class=\"cursor chg-status\">Busy</a></li>"
+                        + "<li><a class=\"cursor chg-status\">DND!</a></li></ul></div>";
+                // Who is online button
                 $form += "<button class=\"logout btn btn-primary btn-sm btn-tooltip\" "
                         + "title=\"Who is online?\" id=\"who\">"
                         + "<span class=\"glyphicon glyphicon-user\"></span></button>";
+                // Logout of room button
                 $form += "<button class=\"logout btn btn-danger btn-sm btn-tooltip\" "
                         + "id=\"logout\" title=\"Logout of room\">"
                         + "<span class=\"glyphicon glyphicon-log-out\"></span></button>";
@@ -84,6 +97,7 @@ function handleMessage(json) {
                 });
                 applyLogoutEvent();
                 applyWhoEvent();
+                applyChangeStatusEvent();
                 $(".btn-tooltip").tooltip();
             }
         }
@@ -131,6 +145,12 @@ function logout() {
     conn.send(JSON.stringify(request));
     window.location.href = window.location.protocol + "//" 
             + window.location.hostname + window.location.pathname;
+}
+
+function applyChangeStatusEvent() {
+    $(".chg-status").on("click", function() {
+        $("#current-status").text($(this).text());
+    });
 }
 
 function applyWhoEvent() {
