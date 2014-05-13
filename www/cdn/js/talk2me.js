@@ -44,7 +44,11 @@ function handleMessage(json) {
             }
         } else if (jsonObj.a === "login") {
             if (jsonObj.isLoggedIn) {
-                alert("That username has already been taken.");
+                $("#login-form").prepend("<div id=\"error\"></div>");
+                $("#error").addClass("alert alert-warning fade in")
+                        .append("<button id=\"close\" class=\"glyphicon glyphicon-remove\"></button>");
+                $("#close").addClass("close").attr({"type":"button", "data-dismiss":"alert"})
+                        .after("That username has already been taken.");
             } else {
                 // Let's not show this form stuff until we get a response back.
                 $form = "<form role=\"form\"><input name=\"message\" id=\"message\" "
@@ -94,7 +98,14 @@ function login() {
 
         startConnection(room, username);
     } else {
-        alert("Please enter a username between 3-8 characters!");
+        if ($("#error").size() > 0) {
+            $("#error").remove();
+        }
+        $("#login-form").prepend("<div id=\"error\"></div>");
+        $("#error").addClass("alert alert-warning fade in")
+                .append("<button id=\"close\" class=\"glyphicon glyphicon-remove\"></button>");
+        $("#close").addClass("close").attr({"type":"button", "data-dismiss":"alert"})
+                .after("Please enter a username between 3-8 characters!");;
         return false;
     }
 }
