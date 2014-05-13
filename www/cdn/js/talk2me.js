@@ -115,11 +115,9 @@ function appendMessage(msg) {
 }
 
 function login() {
-    console.log("reConnect: running login()");
     room = $("#room").val();
     username = $("#username").val();
     if (undefined !== username && username.length > 2 && username.length < 9) {
-        console.log("reConnect: username was good.");
         isLoggedIn = true;
 
         if (undefined !== room && room.length > 1) {
@@ -167,7 +165,6 @@ function applyChangeStatusEvent() {
 function sendChangeStatus(newStatus) {
     $("#current-status").text(newStatus);
     var request = {"a": "statusChange", "status": newStatus};
-    console.log("Sending status change: " + newStatus);
     conn.send(JSON.stringify(request));
 }
 
@@ -196,19 +193,16 @@ function strip_tags(input, allowed) {
 }
 
 function loginToRoom(room, username) {
-    console.log("reConnect: loginToRoom() running");
     try {
         var request = {"a": "login", "room": room, "username": username};
         conn.send(JSON.stringify(request));
     } catch (ex) {
-        console.log("Could not reConnect to room: " + ex);
     }
 }
 
 connected = false;
 function startConnection(room, username) {
     if (!connected) {
-        console.log("reConnect: startConnection() not connected");
         conn = new WebSocket(webSocketUrl);
 
         conn.onopen = function(e) {
@@ -236,7 +230,6 @@ function startConnection(room, username) {
             }
         };
     } else {
-        console.log("reConnect: run loginToRoom(" + room + ", " + username + ")");
         loginToRoom(room, username);
     }
 }
@@ -245,7 +238,6 @@ reConnecting = false;
 function reConnect() {
     reConnecting = true;
     if (!connected) {
-        console.log("reConnect: connected - run init()");
         if ($("#room").size() < 1) {
             $("body").append("<input id=\"room\" type=\"hidden\" />");
         }
@@ -253,7 +245,6 @@ function reConnect() {
             $("body").append("<input id=\"username\" type=\"hidden\" />");
         }
         init();
-        console.log("reConnect: not connected, run reConnect() again");
         setTimeout("reConnect()", 2000);
     }
 }
@@ -264,7 +255,6 @@ function autoSetStatus() {
     var now = Math.round((new Date()).getTime() / 1000);
     var elapsed = now - lastActive;
     if (!idle && elapsed > 15) {
-        console.log("You've been idle for > 15 seconds. " + elapsed + " to be exact.");
         sendChangeStatus("Idle");
         idle = true;
     }
