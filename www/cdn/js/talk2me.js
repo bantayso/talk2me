@@ -160,6 +160,7 @@ function applyChangeStatusEvent() {
         var request = {"a": "statusChange", "status": newStatus};
         console.log("Sending status change: " + newStatus);
         conn.send(JSON.stringify(request));
+        $("#message").focus();
         scrollToBottom();
     });
 }

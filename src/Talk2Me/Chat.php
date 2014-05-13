@@ -133,7 +133,7 @@ class Chat implements MessageComponentInterface {
             if ($status === "Free") {
                 $currentMembers .= "@{$username}, ";
             } else {
-                $currentMembers .= "@{$username}<span class=\"user-status\">({$status})</span>, ";
+                $currentMembers .= "@{$username}.<span class=\"user-status\">{$status}</span>, ";
             }
         }
         $currentMembers = rtrim($currentMembers, ", ");
