@@ -254,7 +254,7 @@ lastActive = Math.round((new Date()).getTime() / 1000);
 function autoSetStatus() {
     var now = Math.round((new Date()).getTime() / 1000);
     var elapsed = now - lastActive;
-    if (!idle && elapsed > $idleInSeconds) {
+    if (!idle && elapsed > idleInSeconds) {
         sendChangeStatus("Idle");
         idle = true;
     }
