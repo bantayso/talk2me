@@ -6,3 +6,4 @@ index.php
 vi.project
 sync_prd.bash
 compile_js.bash
+CommandPlugin.php

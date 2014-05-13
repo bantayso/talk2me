@@ -31,7 +31,10 @@ function sendMessage(msg) {
     var request = {"a": "message", "msg": msg};
     conn.send(JSON.stringify(request));
     appendMessage(msg);
-    // Scroll to bottom of page after typing message.
+    scrollToBottom();
+}
+
+function scrollToBottom() {
     $("html, body").animate({ scrollTop: $(document).height() - $(window).height() });
 }
 
@@ -72,10 +75,13 @@ function handleMessage(json) {
                         + "type=\"button\" class=\"btn btn-default btn-sm dropdown-toggle\" "
                         + "data-toggle=\"dropdown\"><span id=\"current-status\">Free</span> "
                         + "<span class=\"caret\"></span></button><ul class=\"dropdown-menu\" "
-                        + "role=\"menu\"><li><a class=\"cursor chg-status\">Free</a></li><li>"
-                        + "<a class=\"cursor chg-status\">Away</a></li><li>"
-                        + "<a class=\"cursor chg-status\">Busy</a></li>"
-                        + "<li><a class=\"cursor chg-status\">DND!</a></li></ul></div>";
+                        + "role=\"menu\">"
+                        + "<li><a class=\"cursor chg-status\">Free</a></li>"
+                        + "<li><a class=\"cursor chg-status\">BRB</a></li>"
+                        + "<li><a class=\"cursor chg-status\">Away</a></li>"
+                        + "<li><a class=\"cursor chg-status\">Busy</a></li>"
+                        + "<li><a class=\"cursor chg-status\">DND!</a></li>"
+                        + "</ul></div>";
                 // Who is online button
                 $form += "<button class=\"logout btn btn-primary btn-sm btn-tooltip\" "
                         + "title=\"Who is online?\" id=\"who\">"
@@ -154,6 +160,7 @@ function applyChangeStatusEvent() {
         var request = {"a": "statusChange", "status": newStatus};
         console.log("Sending status change: " + newStatus);
         conn.send(JSON.stringify(request));
+        scrollToBottom();
     });
 }
 
@@ -167,6 +174,7 @@ function who() {
     var request = {"a": "who"};
     conn.send(JSON.stringify(request));
     $("#message").focus();
+    scrollToBottom();
 }
 
 function strip_tags(input, allowed) {
@@ -181,13 +189,19 @@ function strip_tags(input, allowed) {
 }
 
 function loginToRoom(room, username) {
-    var request = {"a": "login", "room": room, "username": username};
-    conn.send(JSON.stringify(request));
+    console.log("reConnect: loginToRoom() running");
+    try {
+        var request = {"a": "login", "room": room, "username": username};
+        conn.send(JSON.stringify(request));
+    } catch (ex) {
+        console.log("Could not reConnect to room: " + ex);
+    }
 }
 
 connected = false;
 function startConnection(room, username) {
     if (!connected) {
+        console.log("reConnect: startConnection() not connected");
         conn = new WebSocket(webSocketUrl);
 
         conn.onopen = function(e) {
@@ -203,9 +217,7 @@ function startConnection(room, username) {
             appendMessage("<span class=\"connection-lost\"><strong style=\"color:red;\">Connection lost.</strong> "
                     + "<strong>Refresh to reconnect.</strong> If this persists please "
                     + "contact your system administrator.</span>");
-            if (!connected) {
-                reConnect();
-            }
+            reConnect();
         };
 
         conn.onmessage = function(e) {
@@ -214,16 +226,21 @@ function startConnection(room, username) {
             }
         };
     } else {
+        console.log("reConnect: run loginToRoom(" + room + ", " + username + ")");
         loginToRoom(room, username);
     }
 }
 
 function reConnect() {
     conn = new WebSocket(webSocketUrl);
-    conn.onopen = function(e) {
-        connected = true;
-    };
+    if (!connected) {
+        conn.onopen = function(e) {
+            console.log("reConnect: opened");
+            connected = true;
+        };
+    }
     if (connected) {
+        console.log("reConnect: connected - run init()");
         if ($("#room").size() < 1) {
             $("body").append("<input id=\"room\" type=\"hidden\" />");
         }
@@ -232,6 +249,7 @@ function reConnect() {
         }
         init();
     } else {
+        console.log("reConnect: not connected, run reConnect() again");
         setTimeout("reConnect()", 2000);
     }
 }

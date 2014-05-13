@@ -3,6 +3,10 @@ namespace Talk2Me;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
+if (file_exists(__DIR__ . "/CommandPlugin.php")) { 
+    require_once(__DIR__ . "/CommandPlugin.php");
+}
+
 class Chat implements MessageComponentInterface {
 
     protected $clients;
@@ -97,6 +101,12 @@ class Chat implements MessageComponentInterface {
         if (!isset($t)) {
             $t = "message";
         }
+
+        if (class_exists("Talk2Me\CommandPlugin")) {
+            $cp = new \Talk2Me\CommandPlugin;
+            $cp->execute($from, $json, $t);
+        }
+
         foreach ($this->clients as $client) {
             // Don't send message to the sender.
             if ($from !== $client 
