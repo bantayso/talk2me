@@ -168,6 +168,11 @@ function sendChangeStatus(newStatus) {
     conn.send(JSON.stringify(request));
 }
 
+
+function getStatus() {
+    return $("#current-status").text();
+}
+
 function applyWhoEvent() {
     $("#who").on("click", function() {
         who();
@@ -254,7 +259,7 @@ lastActive = Math.round((new Date()).getTime() / 1000);
 function autoSetStatus() {
     var now = Math.round((new Date()).getTime() / 1000);
     var elapsed = now - lastActive;
-    if (!idle && elapsed > idleInSeconds) {
+    if (!idle && elapsed > idleInSeconds && getStatus() === "Free") {
         sendChangeStatus("Idle");
         idle = true;
     }
@@ -318,7 +323,7 @@ $(document).ready(function() {
         windowFocused = false;
     });
 
-    $(window).on("mousemove, scroll, resize", function() {
+    $(window).on("mousemove, scroll, resize, keypress", function() {
         if (idle) {
             resetIdleStatus();
         }
