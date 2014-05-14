@@ -222,9 +222,10 @@ function startConnection(room, username) {
             $("#message").remove();
             if (!reConnecting) {
                 $("footer").html("<div id=\"login-form\"><!--add form on reconnect--></div>");
-                appendMessage("<span class=\"connection-lost\"><strong style=\"color:red;\">Connection lost.</strong> "
-                        + "<strong>Refresh to reconnect.</strong> If this persists please "
-                        + "contact your system administrator.</span>");
+                appendMessage("<span class=\"connection-lost\"><strong style=\"color:red;\">"
+                        + "Connection lost.</strong> <strong>Refresh to reconnect.</strong> "
+                        + "If this persists please contact your system administrator.</span> "
+                        + "<span class=\"timestamp\">" + getTimestamp() + "</span>");
                 reConnect();
             }
         };

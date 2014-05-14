@@ -55,7 +55,8 @@ class Chat implements MessageComponentInterface {
         } else if ($json->a === "statusChange") {
 
             $this->setUserStatus($from, $json->status);
-            $json->msg = "@" . $this->getUsername($from) . " went " . $json->status;
+            $json->msg = "@" . $this->getUsername($from) . " went " . $json->status 
+                    . " <span class=\"timestamp\">" . date("Y-m-d H:i:s") . "</span>";
             $this->handleMessage($from, $json, "status-message");
 
             return;
