@@ -35,10 +35,10 @@ function sendMessage(msg) {
     if (undefined === msg || msg.length < 1) {
         return;
     }
-    if (msg.match(/(\/logout|\/exit|\/quit|\/q)/)) {
+    if (msg.match(/^\s*(\/logout|\/exit|\/quit|\/q)\s*$/)) {
         logout();
         return;
-    } else if (msg.match(/\/room\s*[0-9a-zA-Z_\-\.]{1,16}/)) {
+    } else if (msg.match(/^\s*\/room\s*[0-9a-zA-Z_\-\.]{1,16}\s*$/)) {
         var room = msg.replace(/\/room\s*([0-9a-zA-Z_\-\.]{1,16})/, "$1");
         window.location.hash = "#" + room + "@" + username;
         location.reload();

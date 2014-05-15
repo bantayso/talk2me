@@ -60,3 +60,16 @@ h1, h2, h3, h4, h5, h6 {
 dl {
     margin:0px;
 }
+
+code {
+    white-space:normal;
+}
+
+dl {
+    margin-top:16px;
+    margin-bottom:16px;
+}
+dd {
+    margin-bottom:16px;
+    margin-left:20px;
+}
