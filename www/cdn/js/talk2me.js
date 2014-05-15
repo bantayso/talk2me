@@ -14,6 +14,18 @@ Date.prototype.timeNow = function () {
             +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
 }
 
+String.prototype.trim = function() { 
+    return this.replace(/^\s +|\s +$/g, ""); 
+} 
+
+String.prototype.ltrim = function() { 
+    return this.replace(/^\s +/, ""); 
+} 
+
+String.prototype.rtrim = function() { 
+    return this.replace(/\s +$/, ""); 
+}
+
 function getTimestamp() {
     var d = new Date(); 
     return d.today() + " " + d.timeNow();
@@ -98,12 +110,21 @@ function appendMessage(msg) {
 }
 
 function login() {
-    room = $("#room").val();
-    username = $("#username").val();
-    if (undefined !== username && username.length > 2 && username.length < 9) {
+    room = $("#room").val().trim();
+    username = $("#username").val().trim();
+    if (undefined !== username && username.match(/^[0-9a-zA-Z_\-\.]{1,16}$/)) {
         isLoggedIn = true;
 
         if (undefined !== room && room.length > 1) {
+            if (!room.match(/^[0-9a-zA-Z_\-\.]{1,16}$/)) {
+                removeErrorMessages();
+                $("#login-form").prepend("<div id=\"error\"></div>");
+                $("#error").addClass("alert alert-warning fade in")
+                        .append("<button id=\"close\">&times;</button>");
+                $("#close").addClass("close").attr({"type":"button", "data-dismiss":"alert"})
+                        .after("Rooms must be 1-16 of these characters: 0-9a-zA-Z_-.");
+                return false;
+}
         } else {
             room = "public";
         }
@@ -117,7 +138,7 @@ function login() {
         $("#error").addClass("alert alert-warning fade in")
                 .append("<button id=\"close\">&times;</button>");
         $("#close").addClass("close").attr({"type":"button", "data-dismiss":"alert"})
-                .after("Please enter a username between 3-8 characters!");;
+                .after("Usernames must be 1-16 of these characters: 0-9a-zA-Z_-.");
         return false;
     }
 }
