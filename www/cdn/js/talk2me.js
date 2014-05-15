@@ -51,8 +51,11 @@ function handleMessage(json) {
     if (isLoggedIn) {
         jsonObj = JSON.parse(json);
         if (jsonObj.a === "message") {
-            var notif = new Audio("cdn/sounds/notification.ogg");
-            notif.play();
+            // Only play sounds for these types of messages.
+            if (jsonObj.t === "message") {
+                var notif = new Audio("cdn/sounds/notification.ogg");
+                notif.play();
+            }
             appendMessage(jsonObj.msg);
             if (!windowFocused && jsonObj.t === "message") {
                 Tinycon.setBubble(++messageCount);
@@ -66,31 +69,11 @@ function handleMessage(json) {
                 $("#close").addClass("close").attr({"type":"button", "data-dismiss":"alert"})
                         .after("Username already taken");
             } else {
-                // Let's not show this form stuff until we get a response back.
-                $form = "<form role=\"form\"><input name=\"message\" id=\"message\" "
-                        + "type=\"text\" class=\"form-control\" "
-                        + "placeholder=\"@" + username + " #" + room + " [enter]\" /></form>";
-                // Status button
-                $form += "<div class=\"btn-group btn-status\"><button "
-                        + "type=\"button\" class=\"btn btn-default btn-sm dropdown-toggle\" "
-                        + "data-toggle=\"dropdown\"><span id=\"current-status\">Free</span> "
-                        + "<span class=\"caret\"></span></button><ul class=\"dropdown-menu\" "
-                        + "role=\"menu\">"
-                        + "<li><a class=\"cursor chg-status\">Free</a></li>"
-                        + "<li><a class=\"cursor chg-status\">BRB</a></li>"
-                        + "<li><a class=\"cursor chg-status\">Away</a></li>"
-                        + "<li><a class=\"cursor chg-status\">Busy</a></li>"
-                        + "<li><a class=\"cursor chg-status\">DND!</a></li>"
-                        + "</ul></div>";
-                // Who is online button
-                $form += "<button class=\"logout btn btn-primary btn-sm btn-tooltip\" "
-                        + "title=\"Who is online?\" id=\"who\">"
-                        + "<span class=\"glyphicon glyphicon-user\"></span></button>";
-                // Logout of room button
-                $form += "<button class=\"logout btn btn-danger btn-sm btn-tooltip\" "
-                        + "id=\"logout\" title=\"Logout of room\">"
-                        + "<span class=\"glyphicon glyphicon-log-out\"></span></button>";
-                $("#login-form").replaceWith($form);
+                var source = $("#message-form").html();
+                var template = Handlebars.compile(source);
+                var context = {room: room, username: username}
+                var html = template(context);
+                $("#login-form").replaceWith(html);
                 $("#message").focus();
                 $("#message").keypress(function (e) {
                     if (e.which == 13) {
@@ -222,10 +205,11 @@ function startConnection(room, username) {
             $("#message").remove();
             if (!reConnecting) {
                 $("footer").html("<div id=\"login-form\"><!--add form on reconnect--></div>");
-                appendMessage("<span class=\"connection-lost\"><strong style=\"color:red;\">"
-                        + "Connection lost.</strong> <strong>Refresh to reconnect.</strong> "
-                        + "If this persists please contact your system administrator.</span> "
-                        + "<span class=\"timestamp\">" + getTimestamp() + "</span>");
+                var source = $("#connection-lost-msg").html();
+                var template = Handlebars.compile(source);
+                var context = {timestamp: getTimestamp()};
+                var html = template(context);
+                appendMessage(html);
                 reConnect();
             }
         };
@@ -256,9 +240,9 @@ function reConnect() {
 }
 
 idle = false;
-lastActive = Math.round((new Date()).getTime() / 1000);
+lastActive = moment().format("X");
 function autoSetStatus() {
-    var now = Math.round((new Date()).getTime() / 1000);
+    var now = moment().format("X");
     var elapsed = now - lastActive;
     if (!idle && elapsed > idleInSeconds && getStatus() === "Free") {
         sendChangeStatus("Idle");
@@ -270,7 +254,7 @@ function autoSetStatus() {
 function resetIdleStatus() {
     if (idle) {
         idle = false;
-        lastActive = Math.round((new Date()).getTime() / 1000);
+        lastActive = moment().format("X");
         sendChangeStatus("Free");
     }
 }

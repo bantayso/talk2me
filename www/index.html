@@ -30,10 +30,44 @@
                 </form>
             </footer>
         </div>
+
+        <script id="message-form" type="text/x-handlebars-template">
+            <form role="form"><input name="message" id="message" 
+                type="text" class="form-control" 
+                placeholder="@{{username}}  #{{room}}  [enter]" /></form>
+            <div class="btn-group btn-status"><button 
+                type="button" class="btn btn-default btn-sm dropdown-toggle" 
+                data-toggle="dropdown"><span id="current-status">Free</span> 
+                <span class="caret"></span></button><ul class="dropdown-menu" 
+                role="menu">
+                <li><a class="cursor chg-status">Free</a></li>
+                <li><a class="cursor chg-status">BRB</a></li>
+                <li><a class="cursor chg-status">Away</a></li>
+                <li><a class="cursor chg-status">Busy</a></li>
+                <li><a class="cursor chg-status">DND!</a></li>
+                </ul></div>
+            <button class="logout btn btn-primary btn-sm btn-tooltip" 
+                title="Who is online?" id="who">
+                <span class="glyphicon glyphicon-user"></span></button>
+            <button class="logout btn btn-danger btn-sm btn-tooltip" 
+                id="logout" title="Logout of room">
+                <span class="glyphicon glyphicon-log-out"></span></button>
+        </script>
+
+        <script id="connection-lost-msg" type="text/x-handlebars-template">
+            <span class="connection-lost"><strong style="color:red;">
+            Connection lost.</strong> <strong>Refresh to reconnect.</strong>
+            If this persists please contact your system administrator.</span>
+            <span class="timestamp">{{timestamp}}</span>
+        </script>
+
         <script src="cdn/js/jquery/1.10.2/jquery-1.10.2.min.js"></script>
         <script src="cdn/js/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+        <script src="cdn/js/handlebars.min.js"></script>
+        <script src="cdn/js/moment.min.js"></script>
         <script src="cdn/js/config.js"></script>
         <script src="cdn/js/tinycon.min.js"></script>
+        <script src="cdn/js/templates.js"></script>
         <script src="cdn/js/talk2me.min.js"></script>
     </body>
 </html>
