@@ -35,6 +35,14 @@ function sendMessage(msg) {
     if (undefined === msg || msg.length < 1) {
         return;
     }
+    if (msg.match(/(\/logout|\/exit|\/quit|\/q)/)) {
+        logout();
+        return;
+    } else if (msg.match(/\/room\s*[0-9a-zA-Z_\-\.]{1,16}/)) {
+        var room = msg.replace(/\/room\s*([0-9a-zA-Z_\-\.]{1,16})/, "$1");
+        window.location.hash = "#" + room + "@" + username;
+        location.reload();
+    }
     msg = "<strong>@" + username + "</strong> " + msg 
             + " <span class=\"timestamp\">" + getTimestamp() + "</span>";
     // These are the allowed HTML tags in messages.
