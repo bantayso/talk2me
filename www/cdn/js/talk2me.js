@@ -42,6 +42,10 @@ function sendMessage(msg) {
         var room = msg.replace(/\/room\s*([0-9a-zA-Z_\-\.]{1,16})/, "$1");
         window.location.hash = "#" + room + "@" + username;
         location.reload();
+        return;
+    } else if (msg.match(/^\s*(\/clear|\/refresh)\s*$/)) {
+        clearMessages();
+        return;
     }
     msg = "<strong>@" + username + "</strong> " + msg 
             + " <span class=\"timestamp\">" + getTimestamp() + "</span>";
@@ -106,6 +110,7 @@ function handleMessage(json) {
                 });
                 applyLogoutEvent();
                 applyWhoEvent();
+                applyClearMessagesEvent();
                 applyChangeStatusEvent();
                 $(".btn-tooltip").tooltip();
             }
@@ -114,7 +119,7 @@ function handleMessage(json) {
 }
 
 function appendMessage(msg) {
-    $(".messages").append("<div class=\"well well-sm\">" + msg + "</div>");
+    $(".messages").append("<div class=\"well well-sm message\">" + msg + "</div>");
 }
 
 function login() {
@@ -189,6 +194,22 @@ function applyWhoEvent() {
     $("#who").on("click", function() {
         who();
     });
+}
+
+function applyClearMessagesEvent() {
+    $("#clear-messages").on("click", function() {
+        clearMessages();
+    });
+}
+
+function clearMessages() {
+    var messages = $(".message");
+    if (messages.size() > 0) {
+        messages.each(function(i, r) {
+            $(r).remove();
+        });
+        who();
+    }
 }
 
 function who() {

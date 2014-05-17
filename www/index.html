@@ -37,8 +37,9 @@
             <form role="form"><input name="message" id="message" 
                 type="text" class="form-control" 
                 placeholder="@{{username}}  #{{room}}  [enter]" /></form>
-            <div class="btn-group btn-status"><button 
+            <div class="btn-group btn-status pull-left btn-tooltiop"><button 
                 type="button" class="btn btn-default btn-sm dropdown-toggle" 
+                title="Set your current status - automatically sets to Idle"
                 data-toggle="dropdown"><span id="current-status">Free</span> 
                 <span class="caret"></span></button><ul class="dropdown-menu" 
                 role="menu">
@@ -48,10 +49,13 @@
                 <li><a class="cursor chg-status">Busy</a></li>
                 <li><a class="cursor chg-status">DND!</a></li>
                 </ul></div>
-            <button class="logout btn btn-primary btn-sm btn-tooltip" 
+            <button class="logout btn btn-primary btn-sm btn-tooltip pull-left" 
                 title="Who is online?" id="who">
                 <span class="glyphicon glyphicon-user"></span></button>
-            <button class="logout btn btn-danger btn-sm btn-tooltip" 
+            <button class="clear-messages btn btn-primary btn-sm btn-tooltip pull-left" 
+                title="Clear all messages" id="clear-messages">
+                <span class="glyphicon glyphicon-refresh"></span></button>
+            <button class="logout btn btn-danger btn-sm btn-tooltip pull-right" 
                 id="logout" title="Logout of room">
                 <span class="glyphicon glyphicon-log-out"></span></button>
         </script>
@@ -69,7 +73,6 @@
         <script src="cdn/js/moment.min.js"></script>
         <script src="cdn/js/config.js"></script>
         <script src="cdn/js/tinycon.min.js"></script>
-        <script src="cdn/js/templates.js"></script>
         <script src="cdn/js/talk2me.min.js"></script>
     </body>
 </html>
