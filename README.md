@@ -1,7 +1,9 @@
 talk2me
 =======
 
-A simple WebSocket chat client and server written in PHP using the Ratchet framework and JavaScript (jQuery) with users and rooms support. By design no data is ever persisted on the client or server side. Chat sessions are not persistent.
+A simple WebSocket chat client and server written in JavaScript, HTML, CSS and PHP. By design messages are never logged or persisted anywhere. Minimal data about connected users is stored in memory on the server side such as room, username and connection ID.
+
+Users connecting to rooms can additional supply a secret to encrypt messages. Members of the room must also know the secret to decrypt messages.
 
 View a demo here: [https://vimeo.com/94716053](https://vimeo.com/94716053)
 
