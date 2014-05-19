@@ -73,3 +73,29 @@ dd {
     margin-bottom:16px;
     margin-left:20px;
 }
+
+.block-hidden {
+    display:none;
+    visibility:hidden;
+}
+.block-visible {
+    display:block;
+    visibility:visible;
+}
+
+.inline-hidden {
+    display:none;
+    visibility:hidden;
+}
+.inline-visible {
+    display:inline;
+    visibility:visible;
+}
+
+#usekey, #key-length {
+    margin-bottom:16px;
+}
+
+#usekey {
+    margin-right:8px;
+}

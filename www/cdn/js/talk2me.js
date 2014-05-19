@@ -32,6 +32,7 @@ function getTimestamp() {
 }
 
 function sendMessage(msg) {
+    var orgMsg = msg;
     if (undefined === msg || msg.length < 1) {
         return;
     }
@@ -47,14 +48,20 @@ function sendMessage(msg) {
         clearMessages();
         return;
     }
+
     msg = "<strong>@" + username + "</strong> " + msg 
             + " <span class=\"timestamp\">" + getTimestamp() + "</span>";
     // These are the allowed HTML tags in messages.
     msg = strip_tags(msg, "<strong><em><table><thead><tbody><tr><th><td>"
             + "<img><br><br/><a><p><div><ul><li><ol><span><hr><hr/><dd><dl><dt>");
+
+    if (usekey) {
+        msg = encryptMessage(msg);
+    }
+
     var request = {"a": "message", "msg": msg};
     conn.send(JSON.stringify(request));
-    appendMessage(msg);
+    appendMessage(orgMsg);
     scrollToBottom();
 }
 
@@ -79,6 +86,11 @@ function handleMessage(json) {
             if (jsonObj.t === "message") {
                 var notif = new Audio("cdn/sounds/notification.ogg");
                 notif.play();
+
+                // Decrypt messages if using a key.
+                if (usekey) {
+                    jsonObj.msg = decryptMessage(jsonObj.msg);
+                }
             }
             appendMessage(jsonObj.msg);
             if (!windowFocused && jsonObj.t === "message") {
@@ -122,6 +134,8 @@ function appendMessage(msg) {
     $(".messages").append("<div class=\"well well-sm message\">" + msg + "</div>");
 }
 
+usekey = false;
+secret = "";
 function login() {
     room = $("#room").val().trim();
     username = $("#username").val().trim();
@@ -140,6 +154,14 @@ function login() {
 }
         } else {
             room = "public";
+        }
+
+        if ($("#usekey").is(":checked")) {
+            usekey = true;
+            secret = $("#secret").val();
+        } else {
+            usekey = false;
+            secret = "";
         }
 
         window.location.hash = room + "@" + username;
@@ -164,6 +186,8 @@ function applyLogoutEvent() {
 
 function logout() {
     isLoggedIn = false;
+    usekey = false;
+    secret = "";
     var request = {"a": "logout"};
     conn.send(JSON.stringify(request));
     window.location.href = window.location.protocol + "//" 
@@ -323,11 +347,59 @@ function init() {
     }
 }
 
+function switchClass(thiz, from, to) {
+    if (thiz.size() > 0) {
+        if (thiz.hasClass(from)) {
+            thiz.removeClass(from);
+        }
+        if (!thiz.hasClass(to)) {
+            thiz.addClass(to);
+        }
+    }
+}
+
+/**
+ * http://updates.html5rocks.com/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
+ */
+function ab2str(buf) {
+    return String.fromCharCode.apply(null, new Uint16Array(buf));
+}
+
+/**
+ * http://updates.html5rocks.com/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
+ */
+function str2ab(str) {
+    var buf = new ArrayBuffer(str.length * 2);
+    var bufView = new Uint16Array(buf);
+    for (var i=0, strLen=str.length; i<strLen; i++) {
+        bufView[i] = str.charCodeAt(i);
+    }
+    return buf;
+}
+
+function encryptMessage(msg) {
+    try {
+        return ab2str(asmCrypto.AES_CBC.encrypt(msg, secret));
+    } catch (ex) {
+        console.log("Could not encrypt message.");
+    }
+}
+
+function decryptMessage(msg) {
+    try {
+        return ab2str(asmCrypto.AES_CBC.decrypt(msg, secret));
+    } catch (ex) {
+        console.log("Could not decrypt message.");
+    }
+}
+
 $(document).ready(function() {
 
     isLoggedIn = false;
 
     init();
+
+    $(".btn-tooltip").tooltip();
 
     $("#room").focus();
 
@@ -339,7 +411,31 @@ $(document).ready(function() {
         }
     });
 
+    $("#login-button").on("click", function() {
+        login();
+        return false;
+    });
+
     applyLogoutEvent();
+
+    $("#usekey").on("click", function() {
+        if ($("#usekey").is(":checked")) {
+            switchClass($("#keyform"), "block-hidden", "block-visible");
+            $("#secret").focus();
+        } else {
+            switchClass($("#keyform"), "block-visible", "block-hidden");
+        }
+    });
+
+    $("#secret").on("keyup", function() {
+        var l = $("#secret").val().length;
+        if (l === 32) {
+            $("#key-length").css("color", "green");
+        } else {
+            $("#key-length").css("color", "red");
+        }
+        $("#key-length").html("Key length is " + l + " characters");
+    });
 
     $(window).on("unload", function() {
         return confirm("Are you sure you want to logout?");

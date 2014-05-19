@@ -20,14 +20,30 @@
                     <div class="form-group">
                         <input type="text" id="room" name="room" 
                                 class="form-control btn-tooltip" 
-                                placeholder="Default room 'public'"
-                                title="Name must be 1-16 of the following characters 0-9a-zA-Z-_." /> 
+                                placeholder="Default room is: public"
+                                title="Room must be 1-16 of the following characters 0-9a-zA-Z-_." /> 
                     </div>
                     <div class="form-group">
                         <input type="text" id="username" name="username" 
                                 class="form-control btn-tooltip" 
-                                placeholder="Choose name [enter]"
+                                placeholder="Choose name"
                                 title="Name must be 1-16 of the following characters 0-9a-zA-Z-_." />
+                    </div>
+                    <input type="checkbox" id="usekey" name="usekey" class="btn-tooltip" value="yes" 
+                            title="Anyone with the secret key can read and send encrypted messages. 
+                            You must use this form to enter the key - direct URL access 
+                            disabled." /> <label for="usekey">Enable client-side encryption</label>
+                    <div id="keyform" class="block-hidden">
+                        <div class="form-group">
+                            <input type="password" id="secret" name="secret" 
+                                    class="form-control btn-tooltip" 
+                                    placeholder="Secret key"
+                                    title="Enter any 32 character secret" maxlength="32" />
+                        </div>
+                        <div id="key-length"></div>
+                    </div>
+                    <div class="form-group">
+                        <button id="login-button" class="login-button btn btn-primary">Login</button>
                     </div>
                 </form>
             </footer>
@@ -36,7 +52,7 @@
         <script id="message-form" type="text/x-handlebars-template">
             <form role="form"><input name="message" id="message" 
                 type="text" class="form-control" 
-                placeholder="@{{username}}  #{{room}}  [enter]" /></form>
+                placeholder="@{{username}}  #{{room}}" /></form>
             <div class="btn-group btn-status pull-left btn-tooltiop"><button 
                 type="button" class="btn btn-default btn-sm dropdown-toggle" 
                 title="Set your current status - automatically sets to Idle"
@@ -71,6 +87,7 @@
         <script src="cdn/js/bootstrap/3.0.0/js/bootstrap.min.js"></script>
         <script src="cdn/js/handlebars.min.js"></script>
         <script src="cdn/js/moment.min.js"></script>
+        <script src="cdn/js/asmcrypto.js"></script>
         <script src="cdn/js/config.js"></script>
         <script src="cdn/js/tinycon.min.js"></script>
         <script src="cdn/js/talk2me.min.js"></script>

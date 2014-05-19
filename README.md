@@ -60,16 +60,3 @@ You can have any number of command that do just about anything you want. For exa
 will return the current forecast.
 
 You could even implement a whole slew of admin commands. e.g. `/admin <password> broadcast-all '<message to send to all connected clients on server>'`
-
-
-
-TODO
-====
-As this is an alpha release there is much refactoring and testing to do.
-
-* Multiple room support.
-* Admin room for sending global messages. (This may now be up to implementation using CommandPlugin)
-* Different sounds for messages, login, logout, ...
-* Ponder settings such as sounds only when name mentioned. Settings would only persist in cookies.
-* Verify all communication is secure.
-* Secure rooms
