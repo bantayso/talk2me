@@ -32,7 +32,6 @@ function getTimestamp() {
 }
 
 function sendMessage(msg) {
-    var orgMsg = msg;
     if (undefined === msg || msg.length < 1) {
         return;
     }
@@ -54,6 +53,7 @@ function sendMessage(msg) {
     // These are the allowed HTML tags in messages.
     msg = strip_tags(msg, "<strong><em><table><thead><tbody><tr><th><td>"
             + "<img><br><br/><a><p><div><ul><li><ol><span><hr><hr/><dd><dl><dt>");
+    var orgMsg = msg;
 
     if (usekey) {
         msg = encryptMessage(msg);
