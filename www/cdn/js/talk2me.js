@@ -288,6 +288,21 @@ function startConnection(room, username) {
             }
         };
 
+        conn.onerror = function(e) {
+            isLoggedIn = false;
+            connected = false;
+            $("#message").remove();
+            if (!reConnecting) {
+                $("footer").html("<div id=\"login-form\"><!--add form on reconnect--></div>");
+                var source = $("#connection-lost-msg").html();
+                var template = Handlebars.compile(source);
+                var context = {timestamp: getTimestamp()};
+                var html = template(context);
+                appendMessage(html);
+                reConnect();
+            }
+        };
+
         conn.onmessage = function(e) {
             if (isLoggedIn) {
                 handleMessage(e.data);

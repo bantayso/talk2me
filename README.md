@@ -23,6 +23,8 @@ Copy `www/cdn/js/example.config.js` to `www/cdn/js/config.js` and update the `we
 
 Open `www/index.html` in a browser, login, and begin chatting.
 
+*Note:* wss may or may not work - still working on secure connections. The only way to ensure a secure connection is to enable client-side encryption. _Please message me if you can help._
+
 
 
 USAGE
