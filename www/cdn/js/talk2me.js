@@ -78,7 +78,7 @@ function removeErrorMessages() {
     }
 }
 
-threshold = 3;
+threshold = 3000;
 lastTyping = parseInt(new Date().getTime()) - threshold;
 function handleMessage(json) {
     if (isLoggedIn) {
@@ -125,13 +125,14 @@ function handleMessage(json) {
                         $("#message").focus();
                         return false;
                     } else {
+                        // This will only send a typing message at most every 'threshold' seconds.
                         var curTyping = parseInt(new Date() . getTime());
                         var test = curTyping - threshold;
-                        console.log("is test > last: " + test + " > " + lastTyping);
                         if (curTyping - threshold > lastTyping) {
+                            console.log("is test > last: " + test + " > " + lastTyping);
                             sendTyping();
+                            lastTyping = curTyping;
                         }
-                        lastTyping = curTyping;
                     }
                 });
                 applyLogoutEvent();
