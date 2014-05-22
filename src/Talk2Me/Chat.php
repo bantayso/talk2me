@@ -61,6 +61,11 @@ class Chat implements MessageComponentInterface {
 
             return;
 
+        } else if ($json->a === "typing") {
+
+            $json->msg = "@" . $this->getUsername($from) . " is typing.";
+            $this->handleMessage($from, $json, "typing");
+            
         }
     }
 
@@ -113,6 +118,7 @@ class Chat implements MessageComponentInterface {
             }
         }
 
+        $fromUsername = $this->getUsername($from);
         foreach ($this->clients as $client) {
             // Don't send message to the sender.
             if ($from !== $client 
@@ -120,6 +126,9 @@ class Chat implements MessageComponentInterface {
                     && $this->getRoom($from) === $this->getRoom($client)) {
                 $o = array("status"=>"ok", "a"=>"message", "t"=>$t, 
                         "msg"=>$json->msg);
+                if ($t === "typing") {
+                    $o['from'] = $fromUsername;
+                }
                 $client->send(json_encode($o));
             }
         }

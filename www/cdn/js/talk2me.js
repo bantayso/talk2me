@@ -78,10 +78,16 @@ function removeErrorMessages() {
     }
 }
 
+threshold = 3;
+lastTyping = parseInt(new Date().getTime()) - threshold;
 function handleMessage(json) {
     if (isLoggedIn) {
         jsonObj = JSON.parse(json);
-        if (jsonObj.a === "message") {
+        if (jsonObj.a === "message" && jsonObj.t === "typing") {
+            if ($(".from-" + jsonObj.from).size() < 1) {
+                $.jGrowl(jsonObj.msg, { life: 1500, group: "from-" + jsonObj.from }); 
+            }
+        } else if (jsonObj.a === "message") {
             // Only play sounds for these types of messages.
             if (jsonObj.t === "message") {
                 var notif = new Audio("cdn/sounds/notification.ogg");
@@ -118,6 +124,13 @@ function handleMessage(json) {
                         $("#message").val('');
                         $("#message").focus();
                         return false;
+                    } else {
+                        var curTyping = parseInt(new Date() . getTime());
+                        console.log("(threshold, lastTyping, curTyping, currTyping-threshold>lastTyping) = (" + threshold + ", " + lastTyping + ", " + curTyping + ", " + (curTyping-threshold) + ">" + lastTyping + ")");
+                        if (curTyping - threshold > lastTyping) {
+                            sendTyping();
+                        }
+                        lastTyping = curTyping;
                     }
                 });
                 applyLogoutEvent();
@@ -128,6 +141,11 @@ function handleMessage(json) {
             }
         }
     }
+}
+
+function sendTyping() {
+    var request = {"a": "typing"};
+    conn.send(JSON.stringify(request));
 }
 
 function appendMessage(msg) {
