@@ -78,6 +78,50 @@ function removeErrorMessages() {
     }
 }
 
+function updateRoomMember(username, currentStatus) {
+    var usernameHtml = "";
+    if (currentStatus === "Free") {
+        usernameHtml = "@" + username;
+    } else {
+        usernameHtml = "@" + username + ".<span class=\"user-status\">" + currentStatus + "</span>";
+    }
+                
+    var user = $(".room-user[data-username='" + username + "']");
+    if (user.size() > 0) {
+        var userHtml = "<span class=\"room-user\" data-username=\"" + username + "\">" + usernameHtml + "</span>";
+        // These two lines move the user to the front of the list as they are the most active.
+        removeRoomMember(username);
+        $("#users-online").prepend(userHtml);
+    }
+}
+
+function addRoomMember(username) {
+    var user = $(".room-user[data-username='" + username + "'");
+    if (user.size() < 1) {
+        var userHtml = "<span class=\"room-user\" data-username=\"" + username + "\">@" + username + "</span>";
+        // This line moves the user to the front of the list as she is the most active.
+        $("#users-online").prepend(userHtml);
+    }
+}
+
+function removeRoomMember(username) {
+    var user = $(".room-user[data-username='" + username + "'");
+    if (user.size() > 0) {
+        user.remove();
+    }
+}
+
+function updateRoomMembers(users) {
+    var usersHtml = "";
+    for (var username in users) {
+        var user = $(".room-user[data-username='" + username + "'");
+        if (user.size() < 1) {
+            usersHtml += "<span class=\"room-user\" data-username=\"" + username + "\">" + users[username] + "</span>";
+        }
+    }
+    $("#users-online").html(usersHtml);
+}
+
 threshold = 2000;
 lastTyping = parseInt(new Date().getTime()) - threshold;
 function handleMessage(json) {
@@ -88,12 +132,18 @@ function handleMessage(json) {
                 $.jGrowl(jsonObj.msg, { life: 3500, group: "from-" + jsonObj.from }); 
             }
         } else if (jsonObj.a === "message" && jsonObj.t === "status-message") {
-            $.jGrowl(jsonObj.msg, { life: 1500, group: "from-status-" + jsonObj.from }); 
-        } else if (jsonObj.a === "message" && jsonObj.t === "status") {
-            appendMessage(jsonObj.msg);
-            if (!windowFocused && jsonObj.t === "message") {
-                Tinycon.setBubble(++messageCount);
+            // This is where we add, remove or update a person in room.
+            if (jsonObj['statusType'] === "disconnect") {
+                removeRoomMember(jsonObj.username);
+            } else if (jsonObj['statusType'] === "join") {
+                addRoomMember(jsonObj.username);
+            } else if (jsonObj['statusType'] === "statusChange") {
+                updateRoomMember(jsonObj.username, jsonObj['currentStatus']);
             }
+
+            $.jGrowl(jsonObj.msg, { life: 1500, group: "from-status-" + jsonObj.from }); 
+        } else if (jsonObj.a === "message" && jsonObj.t === "who") {
+            updateRoomMembers(jsonObj.users);
         } else if (jsonObj.a === "message" && jsonObj.t === "message") {
             // Remove Growls on message received.
             if ($(".from-" + jsonObj.from).size() > 0) {
@@ -141,7 +191,6 @@ function handleMessage(json) {
                         var curTyping = parseInt(new Date() . getTime());
                         var test = curTyping - threshold;
                         if (curTyping - threshold > lastTyping) {
-                            console.log("is test > last: " + test + " > " + lastTyping);
                             sendTyping();
                             lastTyping = curTyping;
                         }
@@ -236,6 +285,7 @@ function applyChangeStatusEvent() {
 }
 
 function sendChangeStatus(newStatus) {
+    updateRoomMember(username, newStatus);
     $("#current-status").text(newStatus);
     var request = {"a": "statusChange", "status": newStatus};
     conn.send(JSON.stringify(request));

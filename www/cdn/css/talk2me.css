@@ -113,3 +113,11 @@ dd {
     -webkit-border-radius:8px;
     -mox-border-radius:8px;
 }
+
+#message {
+    margin-top:8px;
+}
+
+header {
+    margin-bottom:16px;
+}

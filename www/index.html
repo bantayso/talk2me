@@ -50,13 +50,11 @@
             </footer>
         </div>
 
-        <script id="x-room-users-box" type="text/x-handlebars-template">
-            <div id="room-users-box">
-                <span style="font-weight:bold; color:green">Online</span> <span class="room-user">@joe</span> <span class="room-user">@sally</span> <span class="room-user">@sue</span> <span class="room-user">@veronica</span> <span class="room-user">@tashOshowhatdoSa</span> <span class="room-user">@veronica</span> <span class="room-user">@pumpkin</span> <span class="room-user">@spammer</span> <span class="room-user">@breaker1</span> <span class="room-user">@brsams</span> <span class="room-user">@dixie</span>
-            </div>
-        </script>
-
         <script id="message-form" type="text/x-handlebars-template">
+            <div id="room-users-box">
+                <span style="font-weight:bold; color:green">Online</span>
+                <span id="users-online"></span>
+            </div>
             <form role="form"><input name="message" id="message" 
                 type="text" class="form-control" 
                 placeholder="@{{username}}  #{{room}}" /></form>
@@ -72,9 +70,6 @@
                 <li><a class="cursor chg-status">Busy</a></li>
                 <li><a class="cursor chg-status">DND!</a></li>
                 </ul></div>
-            <button class="logout btn btn-primary btn-sm btn-tooltip pull-left" 
-                title="Who is online?" id="who">
-                <span class="glyphicon glyphicon-user"></span></button>
             <button class="clear-messages btn btn-primary btn-sm btn-tooltip pull-left" 
                 title="Clear all messages" id="clear-messages">
                 <span class="glyphicon glyphicon-refresh"></span></button>
