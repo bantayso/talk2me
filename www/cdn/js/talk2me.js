@@ -78,26 +78,33 @@ function removeErrorMessages() {
     }
 }
 
-threshold = 3000;
+threshold = 2000;
 lastTyping = parseInt(new Date().getTime()) - threshold;
 function handleMessage(json) {
     if (isLoggedIn) {
         jsonObj = JSON.parse(json);
         if (jsonObj.a === "message" && jsonObj.t === "typing") {
             if ($(".from-" + jsonObj.from).size() < 1) {
-                $.jGrowl(jsonObj.msg, { life: 2000, group: "from-" + jsonObj.from }); 
+                $.jGrowl(jsonObj.msg, { life: 3500, group: "from-" + jsonObj.from }); 
             }
-        } else if (jsonObj.a === "message") {
-            // Only play sounds for these types of messages.
-            if (jsonObj.t === "message") {
-                var notif = new Audio("cdn/sounds/notification.ogg");
-                notif.play();
+        } else if (jsonObj.a === "message" && jsonObj.t === "status-message") {
+            $.jGrowl(jsonObj.msg, { life: 1500, group: "from-status-" + jsonObj.from }); 
+        } else if (jsonObj.a === "message" && jsonObj.t === "message") {
+            // Remove Growls on message received.
+            if ($(".from-" + jsonObj.from).size() > 0) {
+                lastTyping = parseInt(new Date().getTime()) - threshold;
+                $(".from-" + jsonObj.from).remove();
+            }
 
-                // Decrypt messages if using a key.
-                if (usekey) {
-                    jsonObj.msg = decryptMessage(jsonObj.msg);
-                }
+            // Only play sounds for these types of messages.
+            var notif = new Audio("cdn/sounds/notification.ogg");
+            notif.play();
+
+            // Decrypt messages if using a key.
+            if (usekey) {
+                jsonObj.msg = decryptMessage(jsonObj.msg);
             }
+
             appendMessage(jsonObj.msg);
             if (!windowFocused && jsonObj.t === "message") {
                 Tinycon.setBubble(++messageCount);

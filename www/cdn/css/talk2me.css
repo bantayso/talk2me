@@ -99,3 +99,17 @@ dd {
 #usekey {
     margin-right:8px;
 }
+
+#room-users-box {
+    white-space:nowrap;
+    overflow-x:auto;
+}
+
+.room-user {
+    padding:2px 4px;
+    margin:2px;
+    background-color:#f4eec1;
+    border-radius:8px;
+    -webkit-border-radius:8px;
+    -mox-border-radius:8px;
+}

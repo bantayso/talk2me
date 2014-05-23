@@ -63,7 +63,7 @@ class Chat implements MessageComponentInterface {
 
         } else if ($json->a === "typing") {
 
-            $json->msg = "@" . $this->getUsername($from) . " is typing.";
+            $json->msg = "@" . $this->getUsername($from) . " is typing";
             $this->handleMessage($from, $json, "typing");
             
         }
@@ -93,7 +93,7 @@ class Chat implements MessageComponentInterface {
                 if ($from !== $client 
                         // Ensure message is sent to the proper room.
                         && $this->getRoom($from) === $this->getRoom($client)) {
-                    $o = array("status"=>"ok", "a"=>"message", "t"=>"status", 
+                    $o = array("status"=>"ok", "a"=>"message", "t"=>"status-message", 
                             "msg"=>"<span style=\"color:green;\">@" 
                             . $json->username . " joined</span> <span class=\"timestamp\">" 
                             . date("Y-m-d H:i:s") . "</span>");
@@ -125,10 +125,7 @@ class Chat implements MessageComponentInterface {
                     // Ensure message is sent to the proper room.
                     && $this->getRoom($from) === $this->getRoom($client)) {
                 $o = array("status"=>"ok", "a"=>"message", "t"=>$t, 
-                        "msg"=>$json->msg);
-                if ($t === "typing") {
-                    $o['from'] = $fromUsername;
-                }
+                        "msg"=>$json->msg, "from"=>$fromUsername);
                 $client->send(json_encode($o));
             }
         }
@@ -166,7 +163,7 @@ class Chat implements MessageComponentInterface {
 
         if (isset($room) && isset($username)) {
             foreach ($this->clients as $theClient) {
-                $o = array("status"=>"ok", "a"=>"message", 
+                $o = array("status"=>"ok", "a"=>"message", "t"=>"status-message",
                         "msg"=>"<span style=\"color:red;\">@" 
                         . $username . " disconnected</span> <span class=\"timestamp\">" 
                         . date("Y-m-d H:i:s") . "</span>");
