@@ -240,6 +240,16 @@ function login() {
         if ($("#usekey").is(":checked")) {
             usekey = true;
             secret = $("#secret").val();
+            var l = secret.length;
+            if (l !== 32) {
+                removeErrorMessages();
+                $("#login-form").prepend("<div id=\"error\"></div>");
+                $("#error").addClass("alert alert-warning fade in")
+                        .append("<button id=\"close\">&times;</button>");
+                $("#close").addClass("close").attr({"type":"button", "data-dismiss":"alert"})
+                        .after("Secret key for client-side encryption must be 32 characters.");
+                return false;
+            }
         } else {
             usekey = false;
             secret = "";
@@ -528,10 +538,11 @@ $(document).ready(function() {
         var l = $("#secret").val().length;
         if (l === 32) {
             $("#key-length").css("color", "green");
+            $("#key-length").html("Valid key");
         } else {
             $("#key-length").css("color", "red");
+            $("#key-length").html(l + " characters of 32");
         }
-        $("#key-length").html("Key length is " + l + " characters");
     });
 
     $(window).on("unload", function() {
