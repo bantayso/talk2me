@@ -89,6 +89,11 @@ function handleMessage(json) {
             }
         } else if (jsonObj.a === "message" && jsonObj.t === "status-message") {
             $.jGrowl(jsonObj.msg, { life: 1500, group: "from-status-" + jsonObj.from }); 
+        } else if (jsonObj.a === "message" && jsonObj.t === "status") {
+            appendMessage(jsonObj.msg);
+            if (!windowFocused && jsonObj.t === "message") {
+                Tinycon.setBubble(++messageCount);
+            }
         } else if (jsonObj.a === "message" && jsonObj.t === "message") {
             // Remove Growls on message received.
             if ($(".from-" + jsonObj.from).size() > 0) {
