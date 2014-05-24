@@ -152,7 +152,7 @@ function handleMessage(json) {
             }
 
             // Only play sounds for these types of messages.
-            var notif = new Audio("cdn/sounds/notification.ogg");
+            var notif = new Audio("cdn/sounds/" + notifMessage);
             notif.play();
 
             // Decrypt messages if using a key.

@@ -19,7 +19,7 @@ Run chat server.
 
     php bin/chat-server.php
 
-Copy `www/cdn/js/example.config.js` to `www/cdn/js/config.js` and update the `webSocketUrl`.
+Copy `www/cdn/js/example.config.js` to `www/cdn/js/config.js` and update the `webSocketUrl` and other parameters as desired.
 
 Open `www/index.html` in a browser, login, and begin chatting.
 
