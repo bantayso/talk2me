@@ -153,6 +153,7 @@ function handleMessage(json) {
 
             // Only play sounds for these types of messages.
             var notif = new Audio("cdn/sounds/" + notifMessage);
+            notif.volume = 0.5;
             notif.play();
 
             // Decrypt messages if using a key.
@@ -562,7 +563,7 @@ $(document).ready(function() {
         windowFocused = false;
     });
 
-    $(window).on("mousemove, scroll, resize, keypress", function() {
+    $(window).on("mouseenter, mousemove, mouseover, scroll, resize, keypress, click", function() {
         if (idle) {
             resetIdleStatus();
         }
