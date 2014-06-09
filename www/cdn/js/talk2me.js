@@ -217,7 +217,7 @@ function sendTyping() {
 }
 
 function appendMessage(msg) {
-    $(".messages").prepend("<div class=\"well well-sm message\">" + msg + "</div>");
+    $(".messages").prepend("<div class=\"well well-sm message\">" + Wwiki.render(msg) + "</div>");
 }
 
 usekey = false;
@@ -262,8 +262,11 @@ function login() {
 
         window.location.hash = room + "@" + username;
 
+        $(".header").hide();
+
         startConnection(room, username);
     } else {
+        $(".header").show();
         removeErrorMessages();
         $("#login-form").prepend("<div id=\"error\"></div>");
         $("#error").addClass("alert alert-warning fade in")
