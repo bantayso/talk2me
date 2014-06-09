@@ -17,8 +17,8 @@ strong {
     font-weight:400;
 }
 
-footer {
-    margin-bottom:64px;
+.main-control {
+    margin-bottom:8px;
 }
 
 .well {

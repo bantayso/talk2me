@@ -66,7 +66,7 @@ function sendMessage(msg) {
 }
 
 function scrollToBottom() {
-    $("html, body").animate({ scrollTop: $(document).height() - $(window).height() });
+    //$("html, body").animate({ scrollTop: $(document).height() - $(window).height() });
 }
 
 function removeErrorMessages() {
@@ -213,7 +213,7 @@ function sendTyping() {
 }
 
 function appendMessage(msg) {
-    $(".messages").append("<div class=\"well well-sm message\">" + msg + "</div>");
+    $(".messages").prepend("<div class=\"well well-sm message\">" + msg + "</div>");
 }
 
 usekey = false;
@@ -371,7 +371,7 @@ function startConnection(room, username) {
             connected = false;
             $("#message").remove();
             if (!reConnecting) {
-                $("footer").html("<div id=\"login-form\"><!--add form on reconnect--></div>");
+                $(".main-control").html("<div id=\"login-form\"><!--add form on reconnect--></div>");
                 var source = $("#connection-lost-msg").html();
                 var template = Handlebars.compile(source);
                 var context = {timestamp: getTimestamp()};
@@ -386,7 +386,7 @@ function startConnection(room, username) {
             connected = false;
             $("#message").remove();
             if (!reConnecting) {
-                $("footer").html("<div id=\"login-form\"><!--add form on reconnect--></div>");
+                $(".main-control").html("<div id=\"login-form\"><!--add form on reconnect--></div>");
                 var source = $("#connection-lost-msg").html();
                 var template = Handlebars.compile(source);
                 var context = {timestamp: getTimestamp()};
