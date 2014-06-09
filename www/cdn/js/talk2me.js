@@ -62,11 +62,15 @@ function sendMessage(msg) {
     var request = {"a": "message", "msg": msg};
     conn.send(JSON.stringify(request));
     appendMessage(orgMsg);
-    scrollToBottom();
+    scrollToTop();
 }
 
 function scrollToBottom() {
-    //$("html, body").animate({ scrollTop: $(document).height() - $(window).height() });
+    $("html, body").animate({ scrollTop: $(document).height() - $(window).height() });
+}
+
+function scrollToTop() {
+    $("html, body").animate({ scrollTop: 0 });
 }
 
 function removeErrorMessages() {
@@ -291,7 +295,7 @@ function applyChangeStatusEvent() {
         var newStatus = $(this).text();
         sendChangeStatus(newStatus);
         $("#message").focus();
-        scrollToBottom();
+        scrollToTop();
     });
 }
 
@@ -333,7 +337,7 @@ function who() {
     var request = {"a": "who"};
     conn.send(JSON.stringify(request));
     $("#message").focus();
-    scrollToBottom();
+    scrollToTop();
 }
 
 function strip_tags(input, allowed) {
