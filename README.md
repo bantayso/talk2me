@@ -7,6 +7,17 @@ Users connecting to rooms can additionally supply a secret to encrypt messages. 
 
 View a demo here (usually a few revisions behind): [https://vimeo.com/94716053](https://vimeo.com/94716053)
 
+Features
+========
+
+* Secure WebSockets for instant chat
+* Rooms with multiple users
+* Client-side encryption
+* Status. e.g. Free, Away, Busy, Idle, ...
+* Slash commands similar to IRC. Implement `CommandPlugin` for custom slash commands. e.g. /help
+* User is typing notification.
+* Growl message for things like: status changes, sign on, sign off, user is typing, ...
+* Message filtered through a basic wiki like engine. e.g. [http://www.example.com] is converted into a clickable hyperlink.
 
 INSTALL
 =======
@@ -42,7 +53,6 @@ When you switch to using a secure websocket with protocol `wss://` you will need
 
 Restart stunnel.
 
-
 USAGE
 =====
 
@@ -50,7 +60,44 @@ You can automatically login by appending a HASH to the URL. Enter any room name 
 
 e.g. https://www.example.com/talk2me/#room@username
 
+Message Filtering (Wiki like syntax)
+====================================
 
+Embed YouTube videos.
+
+    {youtube}https://www.youtube.com/watch?v=mgMn68Rgva0{/youtube}
+    
+Insert image.
+
+    {http://www.example.com/image.jpg}
+
+Insert hyper link with custom text.
+
+    [http://www.example.com | This is a link]
+
+Insert a hyper link.
+
+    [http://www.example.com]
+
+Bold text.
+
+    '''make me bold'''
+
+Italic text.
+
+    ''make me italic''
+
+Strikethrough text.
+
+    {-strike me-}
+
+Monospace code font.
+
+    @@This will be monospace@@
+
+Create a line break. i.e. &lt;br /&gt;
+
+    {br}
 
 COMMAND PLUGIN
 ==============
