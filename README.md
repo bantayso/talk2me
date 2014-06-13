@@ -25,6 +25,22 @@ Open `www/index.html` in a browser, login, and begin chatting.
 
 *Note:* wss may or may not work - still working on secure connections. The only way to ensure a secure connection is to enable client-side encryption. _Please message me if you can help._
 
+Setup Stunnel for SSL encryption for secure web sockets
+========================================================
+
+The `www/cdn/js/example.config.js` file defaults to the `ws://` protocol on port 8880.
+
+The port used in `bin/example.config.php` and `www/cdn/js/example.config.js` are both 8880.
+
+When you switch to using a secure websocket with protocol `wss://` you will need to change the port in `www/cdn/js/example.config.js` to 8443 if using the stunnel configuration below. On many machines edit `/etc/stunnel/stunnel.conf` and add the following. You'll need to generate a certificate if you don't have one. You can get free SSL certificates from sites like startssl.com.
+
+    cert = /etc/apache2/ssl/cert.pem
+
+    [talktome]
+    accept = YOUR_PUBLIC_IP_ADDRESS:8443
+    connect = 127.0.0.1:8880
+
+Restart stunnel.
 
 
 USAGE

@@ -100,7 +100,7 @@ function updateRoomMember(username, currentStatus) {
 }
 
 function addRoomMember(username) {
-    var user = $(".room-user[data-username='" + username + "'");
+    var user = $(".room-user[data-username='" + username + "']");
     if (user.size() < 1) {
         var userHtml = "<span class=\"room-user\" data-username=\"" + username + "\">@" + username + "</span>";
         // This line moves the user to the front of the list as she is the most active.
@@ -109,7 +109,7 @@ function addRoomMember(username) {
 }
 
 function removeRoomMember(username) {
-    var user = $(".room-user[data-username='" + username + "'");
+    var user = $(".room-user[data-username='" + username + "']");
     if (user.size() > 0) {
         user.remove();
     }
@@ -118,7 +118,7 @@ function removeRoomMember(username) {
 function updateRoomMembers(users) {
     var usersHtml = "";
     for (var username in users) {
-        var user = $(".room-user[data-username='" + username + "'");
+        var user = $(".room-user[data-username='" + username + "']");
         if (user.size() < 1) {
             usersHtml += "<span class=\"room-user\" data-username=\"" + username + "\">" + users[username] + "</span>";
         }

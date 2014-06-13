@@ -1,3 +1,3 @@
 <?php
 
-$webSocketPort = 12469;
+$webSocketPort = 8443;
