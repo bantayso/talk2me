@@ -1,11 +1,11 @@
 talk2me
 =======
 
-A WebSocket chat client and server written in JavaScript, HTML, CSS and PHP. By design messages are never logged or persisted anywhere. Minimal data about connected users is stored in memory on the server side such as room, username and connection ID.
+talk2me is a WebSocket chat client and server written in JavaScript, HTML, CSS and PHP. The goal is to produce a simple, secure and anonymous chat client. The only data stored is your username and room in memory on the server and is destroyed on disconnect.
 
-Users connecting to rooms can additional supply a secret to encrypt messages. Members of the room must also know the secret to decrypt messages.
+Users connecting to rooms can additionally supply a secret to encrypt messages. Members of the room must also know the secret to decrypt messages. This encryption is performed on the client-side using the asmcrypt.js library.
 
-View a demo here: [https://vimeo.com/94716053](https://vimeo.com/94716053)
+View a demo here (usually a few revisions behind): [https://vimeo.com/94716053](https://vimeo.com/94716053)
 
 
 INSTALL
