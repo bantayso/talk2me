@@ -142,15 +142,17 @@ class Chat implements MessageComponentInterface {
         $room = $this->getRoom($from);
         $currentMembers = "";
         $users = array();
-        foreach ($this->roomUsers[$room] as $username) {
-            $resourceId = array_search($username, $this->users);
-            $status = $this->rooms[$resourceId]['status'];
-            if ($status === "Free") {
-                $currentMembers .= "@{$username}, ";
-                $users[$username] = "@{$username}";
-            } else {
-                $currentMembers .= "@{$username}.<span class=\"user-status\">{$status}</span>, ";
-                $users[$username] .= "@{$username}.<span class=\"user-status\">{$status}</span>";
+        if (isset($this->roomUsers[$room])) {
+            foreach ($this->roomUsers[$room] as $username) {
+                $resourceId = array_search($username, $this->users);
+                $status = $this->rooms[$resourceId]['status'];
+                if ($status === "Free") {
+                    $currentMembers .= "@{$username}, ";
+                    $users[$username] = "@{$username}";
+                } else {
+                    $currentMembers .= "@{$username}.<span class=\"user-status\">{$status}</span>, ";
+                    $users[$username] .= "@{$username}.<span class=\"user-status\">{$status}</span>";
+                }
             }
         }
         $currentMembers = rtrim($currentMembers, ", ");

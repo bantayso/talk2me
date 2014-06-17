@@ -367,12 +367,16 @@ function startConnection(room, username) {
         conn = new WebSocket(webSocketUrl);
 
         conn.onopen = function(e) {
+            if (reConnecting) {
+                clearMessages();
+            }
             connected = true;
             reConnecting = false;
             loginToRoom(room, username);
         };
 
         conn.onclose = function(e) {
+            console.log("closed");
             isLoggedIn = false;
             connected = false;
             $("#message").remove();
