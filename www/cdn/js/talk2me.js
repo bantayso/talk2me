@@ -116,14 +116,13 @@ function removeRoomMember(username) {
 }
 
 function updateRoomMembers(users) {
-    var usersHtml = "";
     for (var username in users) {
         var user = $(".room-user[data-username='" + username + "']");
         if (user.size() < 1) {
-            usersHtml += "<span class=\"room-user\" data-username=\"" + username + "\">" + users[username] + "</span>";
+            $("#users-online").append("<span class=\"room-user\" data-username=\"" 
+                    + username + "\">" + users[username] + "</span>");
         }
     }
-    $("#users-online").html(usersHtml);
 }
 
 threshold = 2000;
