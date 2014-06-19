@@ -38,10 +38,15 @@ h1, h2, h3, h4, h5, h6 {
     margin:0px;
 }
 
-.btn-people, .logout, .btn-status, .clear-messages {
+.btn-people, .btn-status, .clear-messages {
     margin-top:8px;
     margin-bottom:8px;
     margin-right:8px;
+}
+
+.logout {
+    margin-top:8px;
+    margin-bottom:8px;
 }
 
 .btn-people {

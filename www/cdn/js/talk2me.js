@@ -376,7 +376,6 @@ function startConnection(room, username) {
         };
 
         conn.onclose = function(e) {
-            console.log("closed");
             isLoggedIn = false;
             connected = false;
             $("#message").remove();
