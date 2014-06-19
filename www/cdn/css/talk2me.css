@@ -24,6 +24,7 @@ strong {
 .well {
     padding:4px;
     margin-bottom:8px;
+    overflow-x:auto;
 }
 
 .timestamp {
