@@ -120,6 +120,10 @@ dd {
     -mox-border-radius:8px;
 }
 
+.room-user-message {
+    font-weight:bold;
+}
+
 #message {
     margin-top:8px;
 }

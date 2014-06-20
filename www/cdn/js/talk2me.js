@@ -48,7 +48,7 @@ function sendMessage(msg) {
         return;
     }
 
-    msg = "<strong>@" + username + "</strong> " + msg 
+    msg = "<span class=\"room-user-message\">@" + username + "</span> " + msg 
             + " <span class=\"timestamp\">" + getTimestamp() + "</span>";
     // These are the allowed HTML tags in messages.
     msg = strip_tags(msg, "<strong><em><table><thead><tbody><tr><th><td>"
