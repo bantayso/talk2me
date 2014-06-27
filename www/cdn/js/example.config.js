@@ -1,3 +1,3 @@
-webSocketUrl = "ws://www.example.com:8443";
-idleInSeconds = 360;
-notifMessage = "notif-guitar.ogg";
+var webSocketUrl = "ws://www.example.com:8443";
+var idleInSeconds = 360;
+var notifMessage = "notif-guitar.ogg";
